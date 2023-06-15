@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Imgui\imgui.cpp" />
+    <ClCompile Include="Imgui\imgui_demo.cpp" />
+    <ClCompile Include="Imgui\imgui_draw.cpp" />
+    <ClCompile Include="Imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="Imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="Imgui\imgui_tables.cpp" />
+    <ClCompile Include="Imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Camera\Camera.cpp" />
+    <ClCompile Include="TestMenu.cpp" />
+    <ClCompile Include="TestVegetation.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Imgui\imconfig.h" />
+    <ClInclude Include="Imgui\imgui.h" />
+    <ClInclude Include="Imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="Imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="Imgui\imgui_internal.h" />
+    <ClInclude Include="Imgui\imstb_rectpack.h" />
+    <ClInclude Include="Imgui\imstb_textedit.h" />
+    <ClInclude Include="Imgui\imstb_truetype.h" />
+    <ClInclude Include="Imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="Camera\Camera.h" />
+    <ClInclude Include="TestBase.h" />
+    <ClInclude Include="TestMenu.h" />
+    <ClInclude Include="TestVegetation.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\Shaders\entity.vert" />
+    <None Include="Resource\Shaders\entity.frag" />
+    <None Include="Resource\Shaders\plane.vert" />
+    <None Include="Resource\Shaders\plane.frag" />
+    <None Include="Resource\Shaders\grass.vert" />
+    <None Include="Resource\Shaders\grass.frag" />
+    <None Include="Resource\Shaders\grass.geom" />
+    <None Include="Resource\Shaders\grass.tese" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resource\Textures\container.jpg" />
+    <Image Include="Resource\Textures\wall.jpg" />
+    <Image Include="Resource\Textures\metal.png" />
+    <Image Include="Resource\Textures\grass_shape.png" />
+    <Image Include="Resource\Textures\grass_color.png" />
+  </ItemGroup>
+</Project>
