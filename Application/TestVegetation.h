@@ -2,15 +2,7 @@
 #include <vector>
 
 #include <glm/vec3.hpp>
-
-#include "Camera/Camera.h"
 #include "TestBase.h"
-#include "Renderer.h"
-#include "Buffer.h"
-#include "Shader.h"
-#include "ShaderProgram.h"
-#include "Texture.h"
-#include "VertexArray.h"
 
 namespace Test
 {
@@ -19,7 +11,7 @@ namespace Test
 	public:
 		TestVegetation();
 		~TestVegetation() override;
-		virtual void OnUpdate(float deltaTime) override;
+		virtual void OnUpdate(double deltaTime) override;
 		virtual void OnRender() override;
 		virtual void OnImGuiRender() override;
 		virtual void OnMouseClick(int button, int action, int mods) override;
@@ -30,14 +22,13 @@ namespace Test
 		std::vector<glm::vec3> create_grass_vertices();
 		std::vector<glm::vec3> grass_vertices;
 
-		OpenGLPlus::ShaderProgram plane_program;
-		OpenGLPlus::Texture plane_texture;
-		OpenGLPlus::VertexArray plane_vertex_array;
-		OpenGLPlus::Buffer plane_vertex_buffer;
-		OpenGLPlus::ShaderProgram grass_program;
-		OpenGLPlus::VertexArray grass_vertex_array;
-		OpenGLPlus::Buffer grass_vertex_buffer;
-		OpenGLPlus::Renderer renderer;
+		OpenGLWrapper::ShaderProgram plane_program;
+		OpenGLWrapper::Texture plane_texture;
+		OpenGLWrapper::VertexArray plane_vertex_array;
+		OpenGLWrapper::Buffer plane_vertex_buffer;
+		OpenGLWrapper::ShaderProgram grass_program;
+		OpenGLWrapper::VertexArray grass_vertex_array;
+		OpenGLWrapper::Buffer grass_vertex_buffer;
 		Camera camera;
 
 		glm::vec4 topColor = { 0.f, 0.8f, 0.f, 1.f };

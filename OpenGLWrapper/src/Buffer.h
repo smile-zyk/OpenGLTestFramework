@@ -1,7 +1,7 @@
 #pragma once
 #include "GLCommon.h"
 
-namespace OpenGLPlus
+namespace OpenGLWrapper
 {
 	class Buffer
 	{
@@ -19,6 +19,6 @@ namespace OpenGLPlus
 	protected:
 		GLuint id;
 		friend class VertexArray;
-		int size{};
+		GLsizei size{};
 	};
 }

@@ -1,6 +1,6 @@
 #include "Renderer.h"
 
-using namespace OpenGLPlus;
+using namespace OpenGLWrapper;
 
 void Renderer::set_clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
 {
@@ -28,7 +28,7 @@ void Renderer::draw_elements(GLenum mode, GLenum type, const VertexArray& vao, c
 {
 	vao.bind();
 	program.use();
-	int count = 0;
+	GLsizei count = 0;
 	switch (type)
 	{
 	case GL_UNSIGNED_BYTE:

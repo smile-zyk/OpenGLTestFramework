@@ -5,7 +5,7 @@
 #include <iostream>
 #include "Texture.h"
 
-using namespace OpenGLPlus;
+using namespace OpenGLWrapper;
 
 Texture::Texture(GLenum type, const char* path)
 {
@@ -47,7 +47,7 @@ Texture::Texture(GLenum type, const char* path)
 	stbi_image_free(data);
 }
 
-OpenGLPlus::Texture::~Texture()
+OpenGLWrapper::Texture::~Texture()
 {
 	std::cout << "~Texture()" << std::endl;
 	GLCall(glDeleteTextures(1, &id));

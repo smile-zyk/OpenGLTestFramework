@@ -2,7 +2,7 @@
 #include "GLCommon.h"
 #include "Buffer.h"
 
-namespace OpenGLPlus
+namespace OpenGLWrapper
 {
 	class VertexArray
 	{

@@ -14,7 +14,7 @@ void Camera::rotate(const glm::vec2& motion)
     float radius = glm::length(centerVec);
     float yaw = std::atan2(centerVec.x, centerVec.z);
     float pitch = std::asin(centerVec.y / radius);
-    float factor = M_PI * 2.f;
+    float factor = static_cast<float>(M_PI) * 2.f;
     glm::vec3 offset;
     yaw -= motion.x * factor;
     pitch += motion.y * factor;

@@ -2,7 +2,7 @@
 #include "Renderer.h"
 #include <GLFW/glfw3.h>
 
-using namespace OpenGLPlus;
+using namespace OpenGLWrapper;
 
 float planeVertices[] = {
 	// positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
@@ -67,7 +67,7 @@ Test::TestVegetation::~TestVegetation()
 {
 }
 
-void Test::TestVegetation::OnUpdate(float deltaTime)
+void Test::TestVegetation::OnUpdate(double deltaTime)
 {
 }
 
@@ -125,7 +125,6 @@ void Test::TestVegetation::OnImGuiRender()
 	ImGui::SliderFloat("windDirection", &windDirection, 0.f, 360.f);
 	ImGui::SliderFloat("windIntensity", &windIntensity, 0.f, 60.f);
 	ImGui::Checkbox("wireFrame", &isWireFrame);
-	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 }
 
 void Test::TestVegetation::OnMouseClick(int button, int action, int mods)
@@ -167,8 +166,8 @@ void Test::TestVegetation::OnMouseMove(double x, double y)
 			lastMousePos = { currentX, currentY };
 			firstPress = false;
 		}
-		float xOffset = currentX - lastMousePos.x;
-		float yOffset = currentY - lastMousePos.y;
+		float xOffset = static_cast<float>(currentX - lastMousePos.x);
+		float yOffset = static_cast<float>(currentY - lastMousePos.y);
 		glm::vec2 mouseMotion = { xOffset / screen_width, yOffset / screen_height };
 		lastMousePos = { currentX, currentY };
 		if (leftMousePress)
@@ -184,7 +183,7 @@ void Test::TestVegetation::OnMouseMove(double x, double y)
 
 void Test::TestVegetation::OnMouseScroll(double x, double y)
 {
-	camera.approach(y);
+	camera.approach(static_cast<float>(y));
 }
 
 void Test::TestVegetation::OnKeyPress(int key, int scancode, int action, int mods)

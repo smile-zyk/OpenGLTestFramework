@@ -9,7 +9,7 @@
 #include <memory>
 #include <unordered_map>
 
-namespace OpenGLPlus
+namespace OpenGLWrapper
 {
 	class ShaderProgram
 	{

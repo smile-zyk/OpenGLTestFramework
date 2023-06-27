@@ -16,7 +16,7 @@ uniform vec4 btnColor;
 uniform float width;
 uniform float height;
 uniform float time;
-uniform float windDirection; // 0 ~ 360 
+uniform float windDirection; // 0 ~ 360
 uniform float windIntensity; // 0 ~ 90
 
 uniform mat4 modelMatrix;

@@ -3,7 +3,7 @@
 #include "ShaderProgram.h"
 #include "VertexArray.h"
 
-namespace OpenGLPlus
+namespace OpenGLWrapper
 {
 	class Renderer
 	{

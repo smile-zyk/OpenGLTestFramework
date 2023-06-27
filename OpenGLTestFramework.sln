@@ -8,7 +8,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Application", "Application\
 		{4ACFDB34-984B-4E82-8079-9BA211D15399} = {4ACFDB34-984B-4E82-8079-9BA211D15399}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGLPlus", "OpenGLPlus\OpenGLPlus.vcxproj", "{4ACFDB34-984B-4E82-8079-9BA211D15399}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenGLWrapper", "OpenGLWrapper\OpenGLWrapper.vcxproj", "{4ACFDB34-984B-4E82-8079-9BA211D15399}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

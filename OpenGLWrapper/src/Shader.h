@@ -3,7 +3,7 @@
 #include "GLCommon.h"
 #include "Shader.h"
 
-namespace OpenGLPlus
+namespace OpenGLWrapper
 {
 	class Shader
 	{

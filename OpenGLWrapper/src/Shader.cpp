@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 
-using namespace OpenGLPlus;
+using namespace OpenGLWrapper;
 
 Shader::Shader(GLenum type, const char* path)
 {

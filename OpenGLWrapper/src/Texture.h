@@ -3,7 +3,7 @@
 #include "GLCommon.h"
 #include "Texture.h"
 
-namespace OpenGLPlus
+namespace OpenGLWrapper
 {
 	class Texture
 	{

@@ -1,7 +1,8 @@
-bin/
 .vs/
+bin/
 lib/
-x64/
+Application/build/
+OpenGLWrapper/build/
 # Prerequisites
 *.d
 

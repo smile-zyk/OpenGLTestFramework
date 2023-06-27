@@ -15,7 +15,7 @@
 #include "TestMenu.h"
 #include "TestVegetation.h"
 
-using namespace OpenGLPlus;
+using namespace OpenGLWrapper;
 
 //extern "C" __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 
@@ -106,19 +106,22 @@ int main()
 		glfwSetCursorPosCallback(window, OnMouseMove);
 		glfwSetMouseButtonCallback(window, OnMouseClick);
 		glfwSetKeyCallback(window, OnKeyPress);
-
+		double last_frame_time = glfwGetTime();
 		while (!glfwWindowShouldClose(window))
 		{
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			double new_frame_time = glfwGetTime();
+			double frame_duration_time = new_frame_time - last_frame_time;
+			last_frame_time = new_frame_time;
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
 			if (current_test)
 			{
-				current_test->OnUpdate(0.0f);
+				current_test->OnUpdate(frame_duration_time);
 				current_test->OnRender();
 				ImGui::Begin("Test");
-				if (current_test != test_menu && ImGui::Button("<--"))
+				ImGui::LabelText("", "fps: %lf", 1. / frame_duration_time);
+				if (current_test != test_menu && ImGui::Button("Back to menu"))
 				{
 					delete current_test;
 					current_test = test_menu;

@@ -72,7 +72,7 @@
     <ProjectGuid>{4acfdb34-984b-4e82-8079-9ba211d15399}</ProjectGuid>
     <RootNamespace>OpenGLShell</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>OpenGLPlus</ProjectName>
+    <ProjectName>OpenGLWrapper</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -242,14 +242,15 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)lib</OutDir>
-    <IntDir>$(SolutionDir)\bin\$(ProjectName)\imtermediates\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)lib\</OutDir>
+    <IntDir>$(ProjectDir)build\$(Platform)-$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)d</TargetName>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)lib</OutDir>
+    <OutDir>$(SolutionDir)lib\</OutDir>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+    <IntDir>$(ProjectDir)build\$(Platform)-$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
