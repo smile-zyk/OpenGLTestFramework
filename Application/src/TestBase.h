@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Imgui/imgui.h"
-#include "Imgui/imgui_impl_glfw.h"
-#include "Imgui/imgui_impl_opengl3.h"
+#include "imgui.h"
 
-#include "Camera/Camera.h"
+#include "Camera.h"
 #include "TestBase.h"
 #include "Renderer.h"
 #include "Buffer.h"

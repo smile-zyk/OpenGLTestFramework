@@ -1,0 +1,128 @@
+{
+    "version": 5,
+    "configurePresets": [
+        {
+            "name": "Config-Base",
+            "hidden": true,
+            "generator": "Ninja Multi-Config",
+            "cacheVariables": {
+                "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": true,
+                "CMAKE_TOOLCHAIN_FILE": {
+                    "value": "C:/msys64/vcpkg/scripts/buildsystems/vcpkg.cmake",
+                    "type": "FILEPATH"
+                }
+            }
+        },
+        {
+            "name": "Windows-Mingw-Config",
+            "inherits": "Config-Base",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_C_COMPILER": "gcc",
+                "VCPKG_TARGET_TRIPLET" : "x64-mingw-dynamic",
+                "VCPKG_HOST_TRIPLET" : "x64-mingw-dynamic"
+            },
+            "architecture": {
+                "value": "x64"
+            },
+            "toolset": {
+                "value": "host=x64"
+            },
+            "binaryDir": "build"
+        },
+        {
+            "name": "Windows-Config-Base",
+            "inherits": "Config-Base",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "cl",
+                "CMAKE_C_COMPILER": "cl"
+            }
+        },
+        {
+            "name": "x64-Windows-Config",
+            "inherits": "Windows-Config-Base",
+            "architecture": {
+                "value": "x64"
+            },
+            "toolset": {
+                "value": "v143,host=x64"
+            },
+            "binaryDir": "build"
+        },
+        {
+            "name": "x86-Windows-Config",
+            "inherits": "Windows-Config-Base",
+            "architecture": {
+                "value": "x86"
+            },
+            "toolset": {
+                "value": "v143,host=x64"
+            },
+            "binaryDir": "build"
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "x64-Windows-Build-Debug",
+            "configurePreset": "x64-Windows-Config",
+            "configuration": "Debug"
+        },
+        {
+            "name": "x64-Windows-Build-Release",
+            "configurePreset": "x64-Windows-Config",
+            "configuration": "Release"
+        },
+        {
+            "name": "x64-Windows-Build-RelWithDebInfo",
+            "configurePreset": "x64-Windows-Config",
+            "configuration": "RelWithDebInfo"
+        },
+        {
+            "name": "x86-Windows-Build-Debug",
+            "configurePreset": "x86-Windows-Config",
+            "configuration": "Debug"
+        },
+        {
+            "name": "x86-Windows-Build-Release",
+            "configurePreset": "x86-Windows-Config",
+            "configuration": "Release"
+        },
+        {
+            "name": "x86-Windows-Build-RelWithDebInfo",
+            "configurePreset": "x86-Windows-Config",
+            "configuration": "RelWithDebInfo"
+        },
+        {
+            "name": "x64-Windows-MinGW-Debug",
+            "configurePreset": "Windows-Mingw-Config",
+            "configuration": "Debug"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "x64-Windows-Test-Debug",
+            "configurePreset": "x64-Windows-Config",
+            "configuration": "Debug",
+            "output": 
+            {
+                "verbosity":"verbose"
+            }
+        },
+        {
+            "name": "x64-Windows-Test-Release",
+            "configurePreset": "x64-Windows-Config",
+            "configuration": "Release"
+        },
+        {
+            "name": "x64-Windows-Test-RelWithDebInfo",
+            "configurePreset": "x64-Windows-Config",
+            "configuration": "RelWithDebInfo",
+            "output": 
+            {
+                "verbosity":"verbose"
+            }
+        }
+    ]
+}
