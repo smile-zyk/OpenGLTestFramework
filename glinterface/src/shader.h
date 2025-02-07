@@ -1,9 +1,8 @@
 #pragma once
 #include <string>
-#include "GLCommon.h"
-#include "Shader.h"
+#include <glcommon.h>
 
-namespace OpenGLWrapper
+namespace glinterface
 {
 	class Shader
 	{

@@ -1,15 +1,12 @@
 #pragma once
-#include "GLCommon.h"
-#include "Shader.h"
+#include "glcommon.h"
+#include "shader.h"
 
 #include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
 #include <memory>
 #include <unordered_map>
 
-namespace OpenGLWrapper
+namespace glinterface
 {
 	class ShaderProgram
 	{

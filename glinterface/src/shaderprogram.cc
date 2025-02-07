@@ -1,6 +1,8 @@
-#include "ShaderProgram.h"
+#include "shaderprogram.h"
 
-using namespace OpenGLWrapper;
+#include <iostream>
+
+using namespace glinterface;
 
 ShaderProgram::ShaderProgram()
 {
@@ -107,12 +109,12 @@ void ShaderProgram::set_uniform_value(const std::string& name, const glm::mat4& 
 	GLCall(glUniformMatrix4fv(getLocation(name), 1, GL_FALSE, &mat[0][0]));
 }
 
-void OpenGLWrapper::ShaderProgram::set_patch_para(GLenum pname, GLint value)
+void glinterface::ShaderProgram::set_patch_para(GLenum pname, GLint value)
 {
 	GLCall(glPatchParameteri(pname, value));
 }
 
-void OpenGLWrapper::ShaderProgram::set_patch_para(GLenum pname, const GLfloat* values)
+void glinterface::ShaderProgram::set_patch_para(GLenum pname, const GLfloat* values)
 {
 	GLCall(glPatchParameterfv(pname, values));
 }

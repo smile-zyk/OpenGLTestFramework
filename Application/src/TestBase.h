@@ -4,7 +4,7 @@
 
 #include "Camera.h"
 #include "TestBase.h"
-#include "Renderer.h"
+#include "GLInterface.h"
 #include "Buffer.h"
 #include "Shader.h"
 #include "ShaderProgram.h"
@@ -30,6 +30,6 @@ namespace Test
 		virtual void OnMouseScroll(double x, double y) {}
 		virtual void OnKeyPress(int key, int scancode, int action, int mods) {}
 	protected:
-		OpenGLWrapper::Renderer renderer;
+		glinterface::GLInterface GLInterface;
 	};
 }

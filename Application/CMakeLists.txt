@@ -9,6 +9,6 @@ add_executable(${PROJECT_NAME} ${SRC_DIR})
 
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 target_include_directories(${PROJECT_NAME} PRIVATE Camera)
-target_link_libraries(${PROJECT_NAME} PRIVATE OpenGLWrapper)
+target_link_libraries(${PROJECT_NAME} PRIVATE glinterface)
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
 target_link_libraries(${PROJECT_NAME} PRIVATE imgui::imgui)

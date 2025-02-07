@@ -1,8 +1,9 @@
 #include "TestVegetation.h"
-#include "Renderer.h"
+#include "GLInterface.h"
 #include <GLFW/glfw3.h>
+#include <iostream>
 
-using namespace OpenGLWrapper;
+using namespace glinterface;
 
 float planeVertices[] = {
 	// positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
@@ -21,7 +22,7 @@ bool firstPress = true;
 glm::vec2 lastMousePos = { 0.f,0.f };
 
 Test::TestVegetation::TestVegetation()
-	: plane_texture(GL_TEXTURE_2D, "Resource\\Textures\\metal.png"),
+	: plane_texture(GL_TEXTURE_2D, "..\\..\\Application\\Resource\\Textures\\metal.png"),
 	camera(60, 0.1f, 50, static_cast<float>(screen_width) / screen_height)
 {
 	plane_program.attach_shader(std::make_shared<Shader>(GL_VERTEX_SHADER, "..\\..\\Application\\Resource\\Shaders\\plane.vert"));
@@ -59,8 +60,8 @@ Test::TestVegetation::TestVegetation()
 	grass_vertex_array.bind_attrib(0, 0);
 	grass_vertex_array.enable_attrib(0);
 
-	renderer.enable(GL_DEPTH_TEST);
-	renderer.set_clear_color(0.2f, 0.3f, 0.3f, 1.0f);
+	GLInterface.enable(GL_DEPTH_TEST);
+	GLInterface.set_clear_color(0.2f, 0.3f, 0.3f, 1.0f);
 }
 
 Test::TestVegetation::~TestVegetation()
@@ -74,10 +75,10 @@ void Test::TestVegetation::OnUpdate(double deltaTime)
 void Test::TestVegetation::OnRender()
 {
 	if (isWireFrame)
-		renderer.set_polygon_mode(GL_FRONT_AND_BACK, GL_LINE);
+		GLInterface.set_polygon_mode(GL_FRONT_AND_BACK, GL_LINE);
 	else
-		renderer.set_polygon_mode(GL_FRONT_AND_BACK, GL_FILL);
-	renderer.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		GLInterface.set_polygon_mode(GL_FRONT_AND_BACK, GL_FILL);
+	GLInterface.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// render plane
 	for (GLenum err; (err = glGetError()) != GL_NO_ERROR;)
 	{
@@ -90,7 +91,7 @@ void Test::TestVegetation::OnRender()
 	plane_program.set_uniform_value("projectionMatrix", camera.getProjectionMatrix());
 	plane_program.set_uniform_value("texture0", 0);
 	plane_vertex_array.bind();
-	renderer.draw_arrays(GL_TRIANGLES, plane_vertex_array, plane_program);
+	GLInterface.draw_arrays(GL_TRIANGLES, plane_vertex_array, plane_program);
 
 	grass_program.use();
 	grass_program.set_uniform_value("layer", layer);
@@ -111,7 +112,7 @@ void Test::TestVegetation::OnRender()
 	grass_program.set_patch_para(GL_PATCH_DEFAULT_OUTER_LEVEL, outerLev);
 	grass_program.set_patch_para(GL_PATCH_DEFAULT_INNER_LEVEL, innerLev);
 
-	renderer.draw_arrays(GL_PATCHES, grass_vertex_array, grass_program);
+	GLInterface.draw_arrays(GL_PATCHES, grass_vertex_array, grass_program);
 }
 
 void Test::TestVegetation::OnImGuiRender()

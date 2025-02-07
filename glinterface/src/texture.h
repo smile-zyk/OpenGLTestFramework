@@ -1,9 +1,8 @@
 #pragma once
 
-#include "GLCommon.h"
-#include "Texture.h"
+#include "glcommon.h"
 
-namespace OpenGLWrapper
+namespace glinterface
 {
 	class Texture
 	{

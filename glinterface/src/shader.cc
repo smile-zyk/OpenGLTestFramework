@@ -1,10 +1,10 @@
-#include "Shader.h"
+#include "shader.h"
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
-using namespace OpenGLWrapper;
+using namespace glinterface;
 
 Shader::Shader(GLenum type, const char* path)
 {

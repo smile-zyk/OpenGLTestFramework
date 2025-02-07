@@ -1,11 +1,11 @@
 #pragma once
-#include "GLCommon.h"
-#include "ShaderProgram.h"
-#include "VertexArray.h"
+#include "glcommon.h"
+#include "shaderprogram.h"
+#include "vertexarray.h"
 
-namespace OpenGLWrapper
+namespace glinterface
 {
-	class Renderer
+	class GLInterface
 	{
 	public:
 		void set_clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);

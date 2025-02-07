@@ -15,7 +15,7 @@
 #include "TestMenu.h"
 #include "TestVegetation.h"
 
-using namespace OpenGLWrapper;
+using namespace glinterface;
 
 //extern "C" __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 
@@ -54,7 +54,7 @@ void initImgui(GLFWwindow* window)
 
     io.Fonts->AddFontFromFileTTF("Resource\\Fonts\\segoeui.ttf", 30.0f);
 
-    // Setup Platform/Renderer backends
+    // Setup Platform/GLInterface backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 460");
 }

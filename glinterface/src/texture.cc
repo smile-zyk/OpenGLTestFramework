@@ -3,9 +3,8 @@
 #include <stb_image.h>
 #include <cmath>
 #include <iostream>
-#include "Texture.h"
 
-using namespace OpenGLWrapper;
+using namespace glinterface;
 
 Texture::Texture(GLenum type, const char* path)
 {
@@ -47,7 +46,7 @@ Texture::Texture(GLenum type, const char* path)
 	stbi_image_free(data);
 }
 
-OpenGLWrapper::Texture::~Texture()
+glinterface::Texture::~Texture()
 {
 	std::cout << "~Texture()" << std::endl;
 	GLCall(glDeleteTextures(1, &id));

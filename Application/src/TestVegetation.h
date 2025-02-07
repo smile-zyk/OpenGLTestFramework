@@ -22,13 +22,13 @@ namespace Test
 		std::vector<glm::vec3> create_grass_vertices();
 		std::vector<glm::vec3> grass_vertices;
 
-		OpenGLWrapper::ShaderProgram plane_program;
-		OpenGLWrapper::Texture plane_texture;
-		OpenGLWrapper::VertexArray plane_vertex_array;
-		OpenGLWrapper::Buffer plane_vertex_buffer;
-		OpenGLWrapper::ShaderProgram grass_program;
-		OpenGLWrapper::VertexArray grass_vertex_array;
-		OpenGLWrapper::Buffer grass_vertex_buffer;
+		glinterface::ShaderProgram plane_program;
+		glinterface::Texture plane_texture;
+		glinterface::VertexArray plane_vertex_array;
+		glinterface::Buffer plane_vertex_buffer;
+		glinterface::ShaderProgram grass_program;
+		glinterface::VertexArray grass_vertex_array;
+		glinterface::Buffer grass_vertex_buffer;
 		Camera camera;
 
 		glm::vec4 topColor = { 0.f, 0.8f, 0.f, 1.f };

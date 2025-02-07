@@ -1,30 +1,30 @@
-#include "Renderer.h"
+#include "glinterface.h"
 
-using namespace OpenGLWrapper;
+using namespace glinterface;
 
-void Renderer::set_clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
+void GLInterface::set_clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
 {
 	GLCall(glClearColor(red, green, blue, alpha));
 }
 
-void Renderer::clear(GLbitfield mask)
+void GLInterface::clear(GLbitfield mask)
 {
 	GLCall(glClear(mask));
 }
 
-void Renderer::enable(GLenum cap)
+void GLInterface::enable(GLenum cap)
 {
 	GLCall(glEnable(cap));
 }
 
-void Renderer::draw_arrays(GLenum mode, const VertexArray& vao, const ShaderProgram& program)
+void GLInterface::draw_arrays(GLenum mode, const VertexArray& vao, const ShaderProgram& program)
 {
 	vao.bind();
 	program.use();
 	GLCall(glDrawArrays(mode, 0, vao.get_vertex_count()));
 }
 
-void Renderer::draw_elements(GLenum mode, GLenum type, const VertexArray& vao, const ShaderProgram& program)
+void GLInterface::draw_elements(GLenum mode, GLenum type, const VertexArray& vao, const ShaderProgram& program)
 {
 	vao.bind();
 	program.use();
@@ -46,7 +46,7 @@ void Renderer::draw_elements(GLenum mode, GLenum type, const VertexArray& vao, c
 	GLCall(glDrawElements(mode, count, type, 0));
 }
 
-void Renderer::set_polygon_mode(GLenum face, GLenum mode)
+void GLInterface::set_polygon_mode(GLenum face, GLenum mode)
 {
 	GLCall(glPolygonMode(face, mode));
 }

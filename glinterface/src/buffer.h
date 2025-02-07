@@ -1,7 +1,7 @@
 #pragma once
-#include "GLCommon.h"
+#include "glcommon.h"
 
-namespace OpenGLWrapper
+namespace glinterface
 {
 	class Buffer
 	{
