@@ -1,5 +1,3 @@
-#include <vector>
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -9,9 +7,9 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include "TestBase.h"
-#include "TestMenu.h"
-#include "TestVegetation.h"
+#include "test_base.h"
+#include "test_menu.h"
+#include "test_vegetation.h"
 
 using namespace glinterface;
 

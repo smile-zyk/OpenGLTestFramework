@@ -1,6 +1,6 @@
 #pragma once
-#include "GLCommon.h"
-#include "Buffer.h"
+#include "glcommon.h"
+#include "buffer.h"
 
 namespace glinterface
 {

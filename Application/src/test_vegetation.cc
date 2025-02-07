@@ -1,12 +1,12 @@
-#include "TestVegetation.h"
-#include "GLInterface.h"
+#include "test_vegetation.h"
+#include "imgui.h"
+#include "gl_interface.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 
 using namespace glinterface;
 
 float planeVertices[] = {
-	// positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
 	 5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
 	-5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
 	-5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
@@ -87,8 +87,8 @@ void Test::TestVegetation::OnRender()
 	plane_texture.bind(0);
 	plane_program.use();
 	plane_program.set_uniform_value("modelMatrix", glm::mat4(1.f));
-	plane_program.set_uniform_value("viewMatrix", camera.getViewMatrix());
-	plane_program.set_uniform_value("projectionMatrix", camera.getProjectionMatrix());
+	plane_program.set_uniform_value("viewMatrix", camera.view_matrix());
+	plane_program.set_uniform_value("projectionMatrix", camera.projection_matrix());
 	plane_program.set_uniform_value("texture0", 0);
 	plane_vertex_array.bind();
 	GLInterface.draw_arrays(GL_TRIANGLES, plane_vertex_array, plane_program);
@@ -100,8 +100,8 @@ void Test::TestVegetation::OnRender()
 	grass_program.set_uniform_value("width", grassWidth);
 	grass_program.set_uniform_value("height", grassHeight);
 	grass_program.set_uniform_value("modelMatrix", glm::mat4(1.f));
-	grass_program.set_uniform_value("viewMatrix", camera.getViewMatrix());
-	grass_program.set_uniform_value("projectionMatrix", camera.getProjectionMatrix());
+	grass_program.set_uniform_value("viewMatrix", camera.view_matrix());
+	grass_program.set_uniform_value("projectionMatrix", camera.projection_matrix());
 	grass_program.set_uniform_value("windDirection", windDirection);
 	grass_program.set_uniform_value("windIntensity", windIntensity);
 	grass_program.set_uniform_value("time", static_cast<float>(glfwGetTime()));
@@ -191,7 +191,7 @@ void Test::TestVegetation::OnKeyPress(int key, int scancode, int action, int mod
 {
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
 	{
-		camera.setCenter({0.f, 0.f, 0.f});
+		camera.set_center({0.f, 0.f, 0.f});
 	}
 }
 

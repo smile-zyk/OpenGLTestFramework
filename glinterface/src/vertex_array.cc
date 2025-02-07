@@ -1,5 +1,4 @@
-#include "VertexArray.h"
-#include <iostream>
+#include "vertex_array.h"
 
 glinterface::VertexArray::VertexArray()
 {
@@ -8,7 +7,6 @@ glinterface::VertexArray::VertexArray()
 
 glinterface::VertexArray::~VertexArray()
 {
-	std::cout << "~VertexArray()" << std::endl;
 	GLCall(glDeleteVertexArrays(1, &id))
 }
 

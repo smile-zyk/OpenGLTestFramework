@@ -1,15 +1,6 @@
 #pragma once
 
-#include "imgui.h"
-
-#include "Camera.h"
-#include "TestBase.h"
-#include "GLInterface.h"
-#include "Buffer.h"
-#include "Shader.h"
-#include "ShaderProgram.h"
-#include "Texture.h"
-#include "VertexArray.h"
+#include "gl_interface.h"
 
 extern int screen_width;
 extern int screen_height;

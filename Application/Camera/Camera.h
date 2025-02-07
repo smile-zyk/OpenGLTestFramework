@@ -1,27 +1,16 @@
 #pragma once
-#define _USE_MATH_DEFINES
-#include <cmath>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/mat4x4.hpp>
 
-//Orbit Camera
 class Camera
 {
 public:
-    explicit Camera(float _fov, float _zNear, float _zFar, float _aspect);
-    void rotate(const glm::vec2& motion);
-    void move(const glm::vec2& motion);
-    void approach(float ratio);
-    glm::mat4 getViewMatrix();
-    glm::mat4 getProjectionMatrix();
-    void setCenter(const glm::vec3& pos);
-private:
-    float fov;
-    float zNear;
-    float zFar;
-    float aspect;
-    glm::vec3 position;
-    glm::vec3 center;
+    glm::mat4 view_matrix() { return view_matrix_;}
+    glm::mat4 projection_matrix() { return projection_matrix_; }
+    glm::mat4 GetViewProjectionMatrix() { return view_matrix_ * projection_matrix_; }
+    virtual void UpdateViewMatrix() = 0;
+    virtual void UpdateProjectionMatrix() = 0;
+protected:
+    glm::mat4 projection_matrix_; 
+    glm::mat4 view_matrix_; 
 };
-

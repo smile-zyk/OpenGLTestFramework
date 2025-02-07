@@ -1,4 +1,6 @@
-#include "TestMenu.h"
+#include "test_menu.h"
+#include <freetype-gl/freetype-gl.h>
+#include <imgui.h>
 
 Test::TestMenu::TestMenu(TestBase*& _test) : current_test(_test)
 {

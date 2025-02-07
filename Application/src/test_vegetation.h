@@ -2,7 +2,9 @@
 #include <vector>
 
 #include <glm/vec3.hpp>
-#include "TestBase.h"
+#include "test_base.h"
+#include "texture.h"
+#include "camera_3d.h"
 
 namespace Test
 {
@@ -29,7 +31,7 @@ namespace Test
 		glinterface::ShaderProgram grass_program;
 		glinterface::VertexArray grass_vertex_array;
 		glinterface::Buffer grass_vertex_buffer;
-		Camera camera;
+		Camera3D camera;
 
 		glm::vec4 topColor = { 0.f, 0.8f, 0.f, 1.f };
 		glm::vec4 btnColor = { 0.f, 0.2f, 0.f, 1.f };

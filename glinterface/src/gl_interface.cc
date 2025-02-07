@@ -1,4 +1,4 @@
-#include "glinterface.h"
+#include "gl_interface.h"
 
 using namespace glinterface;
 
