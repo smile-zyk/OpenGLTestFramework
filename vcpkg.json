@@ -5,6 +5,12 @@
       "stb",
       "glfw3",
       {
+        "name": "freetype-gl",
+        "features":[
+          "glad"
+        ]
+      },
+      {
         "name": "imgui",
         "features": [
           "docking-experimental",

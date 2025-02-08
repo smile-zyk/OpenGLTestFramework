@@ -9,6 +9,7 @@
 
 #include "test_base.h"
 #include "test_menu.h"
+#include "test_2d.h"
 #include "test_vegetation.h"
 
 using namespace glinterface;
@@ -63,7 +64,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     
     // create glfw window
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "OpenGLPlayground", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "OpenglLab", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -94,6 +95,7 @@ int main()
 		current_test = test_menu;
 
 		test_menu->RegisterTest<Test::TestVegetation>("Vegetation Demo");
+		test_menu->RegisterTest<Test::Test2D>("2D");
 
 		// set window resize callback
 		glfwSetFramebufferSizeCallback(window, OnWindowResize);

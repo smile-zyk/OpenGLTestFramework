@@ -17,9 +17,9 @@ void Camera2D::Move(glm::vec2 motion)
     UpdateViewMatrix();
 }
 
-void Camera2D::Zoom(float zoom)
+void Camera2D::Zoom(float ratio)
 {
-    zoom_ = zoom;
+    zoom_ *= (float)std::pow(0.95, ratio);
     UpdateProjectionMatrix();
 }
 
@@ -44,5 +44,10 @@ void Camera2D::UpdateViewMatrix()
 
 void Camera2D::UpdateProjectionMatrix()
 {
-    projection_matrix_ = glm::ortho(-width_ / (2.f * zoom_) , width_ / (2.f * zoom_) , -height_ / (2.f * zoom_), height_ / (2.f * zoom_), near_, far_);
+    projection_matrix_ = glm::ortho(-width_ / (2.f * zoom_) , width_ / (2.f * zoom_) , -height_ / (2.f * zoom_), height_ / (2.f * zoom_), near_/ zoom_, far_ / zoom_);
+}
+
+void Camera2D::set_center(glm::vec2 center)
+{
+    center_ = center;
 }

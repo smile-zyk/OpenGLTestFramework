@@ -1,4 +1,4 @@
-#version 460 core
+#version 430 core
 
 layout (triangles, fractional_even_spacing, point_mode) in;
 

@@ -13,6 +13,7 @@ public:
     void SetNearFar(float near, float far);
     void UpdateViewMatrix() override;
     void UpdateProjectionMatrix() override;
+    void set_center(glm::vec2 center);
 private:
     glm::vec2 center_{};
     float zoom_{1.f};

@@ -42,6 +42,10 @@ namespace Test
 		bool isWireFrame = false;
 		float windDirection = 0.f;
 		float windIntensity = 30.f;
+		bool leftMousePress = false;
+		bool rightMousePress = false;
+		bool firstPress = true;
+		glm::vec2 lastMousePos = { 0.f,0.f };
 	};
 }
 

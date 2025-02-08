@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gl_interface.h"
+#include <GLFW/glfw3.h>
 
 extern int screen_width;
 extern int screen_height;
@@ -21,6 +22,6 @@ namespace Test
 		virtual void OnMouseScroll(double x, double y) {}
 		virtual void OnKeyPress(int key, int scancode, int action, int mods) {}
 	protected:
-		glinterface::GLInterface GLInterface;
+		glinterface::GLInterface gl_interface_;
 	};
 }

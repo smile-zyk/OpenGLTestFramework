@@ -21,7 +21,6 @@ ShaderProgram::ShaderProgram(const char* vertexPath, const char* fragmentPath, c
 
 ShaderProgram::~ShaderProgram()
 {
-	std::cout << "~Program()" << std::endl;
 	GLCall(glDeleteProgram(id));
 }
 

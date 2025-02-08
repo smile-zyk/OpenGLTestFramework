@@ -1,4 +1,5 @@
 #include "gl_interface.h"
+#include "glcommon.h"
 
 using namespace glinterface;
 
@@ -15,6 +16,16 @@ void GLInterface::clear(GLbitfield mask)
 void GLInterface::enable(GLenum cap)
 {
 	GLCall(glEnable(cap));
+}
+
+void GLInterface::disable(GLenum cap)
+{
+	GLCall(glDisable(cap));
+}
+
+void GLInterface::draw_arrays(GLenum mode, GLint count)
+{
+	GLCall(glDrawArrays(mode, 0, count));
 }
 
 void GLInterface::draw_arrays(GLenum mode, const VertexArray& vao, const ShaderProgram& program)
