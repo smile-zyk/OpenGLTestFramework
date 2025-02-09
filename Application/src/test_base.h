@@ -13,10 +13,10 @@ namespace Test
 	public:
 		TestBase() {}
 		virtual ~TestBase() {}
-
 		virtual void OnUpdate(double deltaTime) {}
 		virtual void OnRender() {}
 		virtual void OnImGuiRender() {}
+		virtual void OnWindowResize(int width, int height) {}
 		virtual void OnMouseClick(int button, int action, int mods) {}
 		virtual void OnMouseMove(double x, double y) {}
 		virtual void OnMouseScroll(double x, double y) {}

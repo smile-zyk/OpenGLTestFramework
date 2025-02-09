@@ -12,7 +12,7 @@ vec2 grid_plane[6] = vec2[]
     vec2(-1, -1), vec2(1, 1), vec2(1, -1)
 );
 
-vec3 NDC2World(vec3 p_ndc, mat4 view, mat4 proj)
+vec3 ndc2world(vec3 p_ndc, mat4 view, mat4 proj)
 {
     mat4 view_inv = inverse(view);
     mat4 proj_inv = inverse(proj);
@@ -23,6 +23,6 @@ vec3 NDC2World(vec3 p_ndc, mat4 view, mat4 proj)
 void main() 
 {
     vec2 p = grid_plane[gl_VertexID];
-    frag_pos = NDC2World(vec3(p.xy, 0.0), view_matrix, projection_matrix);
+    frag_pos = ndc2world(vec3(p.xy, 0.0), view_matrix, projection_matrix);
     gl_Position = vec4(p, 0.0, 1.0);
 }

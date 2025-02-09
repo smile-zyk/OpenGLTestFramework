@@ -11,7 +11,7 @@ namespace Test
         grid_shader_.attach_shader(std::make_shared<Shader>(GL_VERTEX_SHADER, "..\\..\\Application\\Resource\\Shaders\\grid.vert"));
         grid_shader_.attach_shader(std::make_shared<Shader>(GL_FRAGMENT_SHADER, "..\\..\\Application\\Resource\\Shaders\\grid.frag"));
         grid_shader_.link();
-        gl_interface_.set_clear_color(0.1f, 0.1f, 0.1f, 1.0f);
+        gl_interface_.set_clear_color(0.2f, 0.2f, 0.2f, 1.0f);
         gl_interface_.enable(GL_DEPTH_TEST);
         gl_interface_.enable(GL_BLEND);
         gl_interface_.enable(GL_CULL_FACE);
@@ -35,6 +35,7 @@ namespace Test
         grid_shader_.set_uniform_value("view_matrix", camera_.view_matrix());
         grid_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
         grid_shader_.set_uniform_value("draw_axis", true);
+        grid_shader_.set_uniform_value("scene_center", camera_.center());
         gl_interface_.disable(GL_CULL_FACE);
         grid_vertex_array_.bind();
         gl_interface_.draw_arrays(GL_TRIANGLES, 6);
@@ -44,6 +45,11 @@ namespace Test
     void Test2D::OnImGuiRender()
     {
         
+    }
+    
+    void Test2D::OnWindowResize(int width, int height)
+    {
+        camera_.SetViewPort(width, height);
     }
 
     void Test2D::OnMouseClick(int button, int action, int mods)
@@ -87,7 +93,7 @@ namespace Test
             }
             float xOffset = static_cast<float>(currentX - lastMousePos.x);
             float yOffset = static_cast<float>(currentY - lastMousePos.y);
-            glm::vec2 mouseMotion = { xOffset / screen_width, yOffset / screen_height };
+            glm::vec2 mouseMotion = { xOffset / screen_width, -yOffset / screen_height };
             lastMousePos = { currentX, currentY };
             camera_.Move(mouseMotion);
         }

@@ -97,7 +97,6 @@ int main()
 		test_menu->RegisterTest<Test::TestVegetation>("Vegetation Demo");
 		test_menu->RegisterTest<Test::Test2D>("2D");
 
-		// set window resize callback
 		glfwSetFramebufferSizeCallback(window, OnWindowResize);
 		glfwSetScrollCallback(window, OnMouseScroll);
 		glfwSetCursorPosCallback(window, OnMouseMove);
@@ -156,7 +155,13 @@ int main()
 
 void OnWindowResize(GLFWwindow* window, int width, int height)
 {
+	screen_width = width;
+	screen_height = height;
 	glViewport(0, 0, width, height);
+	if(current_test != nullptr)
+	{
+		current_test->OnWindowResize(width, height);
+	}
 }
 
 void OnMouseClick(GLFWwindow* window, int button, int action, int mods)

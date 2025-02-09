@@ -11,13 +11,14 @@ namespace Test
     public:
         Test2D();
         ~Test2D() override;
-        virtual void OnUpdate(double deltaTime) override;
-		virtual void OnRender() override;
-		virtual void OnImGuiRender() override;
-		virtual void OnMouseClick(int button, int action, int mods) override;
-		virtual void OnMouseMove(double x, double y) override;
-		virtual void OnMouseScroll(double x, double y) override;
-		virtual void OnKeyPress(int key, int scancode, int action, int mods) override;
+        void OnUpdate(double deltaTime) override;
+		void OnRender() override;
+		void OnImGuiRender() override;
+        void OnWindowResize(int width, int height) override;
+		void OnMouseClick(int button, int action, int mods) override;
+		void OnMouseMove(double x, double y) override;
+		void OnMouseScroll(double x, double y) override;
+		void OnKeyPress(int key, int scancode, int action, int mods) override;
     private:
         Camera2D camera_;
         glinterface::ShaderProgram grid_shader_;

@@ -12,14 +12,14 @@ Camera2D::Camera2D(int width, int height, float near, float far): width_(width),
 
 void Camera2D::Move(glm::vec2 motion)
 {
-    float factor = width_ / zoom_;
+    glm::vec2 factor(width_ / zoom_, height_ / zoom_);
     center_ += motion * factor;
     UpdateViewMatrix();
 }
 
 void Camera2D::Zoom(float ratio)
 {
-    zoom_ *= (float)std::pow(0.95, ratio);
+    zoom_ *= (float)std::pow(0.95, -ratio);
     UpdateProjectionMatrix();
 }
 
@@ -50,4 +50,10 @@ void Camera2D::UpdateProjectionMatrix()
 void Camera2D::set_center(glm::vec2 center)
 {
     center_ = center;
+    UpdateViewMatrix();
+}
+
+glm::vec2 Camera2D::center()
+{
+    return center_;
 }
