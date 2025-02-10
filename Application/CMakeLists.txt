@@ -4,7 +4,7 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(freetype-gl CONFIG REQUIRED)
 aux_source_directory(src SRC_DIR)
-aux_source_directory(Camera SRC_DIR)
+aux_source_directory(camera SRC_DIR)
 
 add_executable(${PROJECT_NAME} ${SRC_DIR})
 

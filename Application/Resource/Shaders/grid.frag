@@ -3,6 +3,9 @@ in vec3 frag_pos;
 
 out vec4 frag_color;
 
+uniform bool draw_x_axis;
+uniform bool draw_y_axis;
+
 float min_cell_size = 0.1f;
 float min_cell_pixel_size = 5.f;
 float line_width = 2.f;
@@ -55,8 +58,8 @@ vec4 grid(vec2 frag_pos)
     float alpha1 = 1.0 - min_vec2(clamp(remain_vec2(frag_pos, lod1) / derivative / half_line_width, 0.0, 1.0));
     float alpha2 = 1.0 - min_vec2(clamp(remain_vec2(frag_pos, lod2) / derivative / half_line_width, 0.0, 1.0));
 
-    bool is_in_axis_x = (abs(frag_pos.y) / derivative.y / half_line_width) < 1.0;
-    bool is_in_axis_y = (abs(frag_pos.x) / derivative.x / half_line_width) < 1.0;  
+    bool is_in_axis_x = draw_x_axis ? (abs(frag_pos.y) / derivative.y / half_line_width) < 1.0 : false;
+    bool is_in_axis_y = draw_y_axis ? (abs(frag_pos.x) / derivative.x / half_line_width) < 1.0 : false;  
     
     return vec4(
         is_in_axis_x ? axis_x_color : is_in_axis_y ? axis_y_color : alpha2 > 0.0 ? thick_color : alpha1 > 0.0 ? mix(thick_color, thin_color, fade) : thin_color,

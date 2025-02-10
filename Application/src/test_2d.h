@@ -1,8 +1,11 @@
 #pragma once
 
+#include "buffer.h"
 #include "shader_program.h"
 #include "test_base.h"
 #include "camera_2d.h"
+#include "rect.h"
+#include "vertex_array.h"
 
 namespace Test
 {
@@ -22,10 +25,17 @@ namespace Test
     private:
         Camera2D camera_;
         glinterface::ShaderProgram grid_shader_;
+        glinterface::ShaderProgram rect_shader_;
         glinterface::VertexArray grid_vertex_array_;
-        bool leftMousePress = false;
-		bool rightMousePress = false;
-		bool firstPress = true;
-		glm::vec2 lastMousePos = { 0.f,0.f };
+        glinterface::VertexArray rect_vertex_array_;
+        glinterface::Buffer rect_vertex_buffer_;
+        glinterface::Buffer rect_index_buffer_;
+        void* rect_vertex_buffer_map_;
+        void* rect_index_buffer_map_;
+        bool mouse_left_pressed_ = false;
+		bool mouse_right_pressed_ = false;
+		bool first_pressed = true;
+		glm::vec2 origin_pressed_pos_ = { 0.f,0.f };
+        Rect select_rect_;
     };
 }
