@@ -21,21 +21,7 @@ namespace Test
         rect_shader_.attach_shader(std::make_shared<Shader>(GL_FRAGMENT_SHADER, "..\\..\\Application\\Resource\\Shaders\\rect.frag"));        
         rect_shader_.link();
 
-        // bind select box vertex array
-        GLbitfield map_flags = GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_WRITE_BIT;
-        rect_vertex_buffer_.allocate_storage(4 * sizeof(RectVertex), nullptr, map_flags);
-        rect_vertex_buffer_map_ = rect_vertex_buffer_.map_memory_range(0, 4 * sizeof(RectVertex), map_flags);
-        rect_index_buffer_.allocate_storage(6 * sizeof(GLuint), nullptr, map_flags);
-        rect_index_buffer_map_ = rect_index_buffer_.map_memory_range(0, 6 * sizeof(GLuint), map_flags);
-        rect_vertex_array_.bind_vertex_buffer(0, rect_vertex_buffer_, offsetof(RectVertex, screen_uv), sizeof(RectVertex));
-        rect_vertex_array_.bind_vertex_buffer(1, rect_vertex_buffer_, offsetof(RectVertex, tex_coord), sizeof(RectVertex));
-        rect_vertex_array_.set_attrib(0, 2, GL_FLOAT, false, 0);
-        rect_vertex_array_.set_attrib(1, 2, GL_FLOAT, false, 0);
-        rect_vertex_array_.bind_attrib(0, 0);
-        rect_vertex_array_.bind_attrib(1, 1);
-        rect_vertex_array_.enable_attrib(0);
-        rect_vertex_array_.enable_attrib(1);
-        rect_vertex_array_.bind_element_buffer(rect_index_buffer_);
+        // GLbitfield map_flags = GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_WRITE_BIT;
 
         gl_interface_.set_clear_color(0.2f, 0.2f, 0.2f, 1.0f);
         gl_interface_.enable(GL_DEPTH_TEST);
@@ -67,10 +53,13 @@ namespace Test
 
         if(select_rect_.IsValid())
         {
-            auto data = select_rect_.GetRenderData();
-            memcpy(rect_vertex_buffer_map_, data.rect_vertices.data(), data.rect_vertices.size() * sizeof(RectVertex));
-            memcpy(rect_index_buffer_map_, data.rect_indices.data(), data.rect_indices.size() * sizeof(GLuint));
-            gl_interface_.draw_elements(GL_TRIANGLES, GL_UNSIGNED_INT, rect_vertex_array_, rect_shader_);
+            rect_shader_.use();
+            rect_shader_.set_uniform_value("view_matrix", camera_.view_matrix());
+            rect_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
+            rect_shader_.set_uniform_value("rect_min", select_rect_.GetMin());
+            rect_shader_.set_uniform_value("rect_max", select_rect_.GetMax());
+            rect_vertex_array_.bind();
+            gl_interface_.draw_arrays(GL_TRIANGLES, 6);
         }
     }
     

@@ -28,10 +28,7 @@ namespace Test
         glinterface::ShaderProgram rect_shader_;
         glinterface::VertexArray grid_vertex_array_;
         glinterface::VertexArray rect_vertex_array_;
-        glinterface::Buffer rect_vertex_buffer_;
-        glinterface::Buffer rect_index_buffer_;
         void* rect_vertex_buffer_map_;
-        void* rect_index_buffer_map_;
         bool mouse_left_pressed_ = false;
 		bool mouse_right_pressed_ = false;
 		bool first_pressed = true;
