@@ -58,6 +58,7 @@ namespace Test
             rect_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
             rect_shader_.set_uniform_value("rect_min", select_rect_.GetMin());
             rect_shader_.set_uniform_value("rect_max", select_rect_.GetMax());
+            rect_shader_.set_uniform_value("mode", 2);
             rect_vertex_array_.bind();
             gl_interface_.draw_arrays(GL_TRIANGLES, 6);
         }

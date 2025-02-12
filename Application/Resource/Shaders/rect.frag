@@ -8,17 +8,17 @@ uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
 uniform vec2 rect_min;
 uniform vec2 rect_max;
+uniform int mode;
 
 const int NO_OUTLINE = 0;
 const int SOLID_OUTLINE = 1;
 const int DASH_OUTLINE = 2;
 
-int mode = SOLID_OUTLINE;
-float dash_size = 8.f;
-float gap_size = 4.f;
-float outline_width = 2.f;
-vec3 outline_color = vec3(1.f, 0.f, 0.f);
-vec4 filled_color = vec4(0.8f, 0.8f, 0.8f, 0.5);
+float dash_size = 20.f;
+float gap_size = 10.f;
+float outline_width = 5.f;
+vec4 outline_color = vec4(0.8f, 0.8f, 0.8f, 0.8f);
+vec4 filled_color = vec4(0.6f, 0.6f, 0.6f, 0.5);
 
 float max_vec2(vec2 v)
 {
@@ -37,31 +37,46 @@ vec2 ndc2world(vec2 p_ndc, mat4 view, mat4 proj)
     return (view_inv * proj_inv * vec4(p_ndc, 1.0, 1.0)).xy;
 }
 
-bool outline(vec2 scene_rect_min, vec2 scene_rect_max, vec2 scene_pos)
+bool outline(vec2 scene_rect_min, vec2 scene_rect_max, vec2 origin_scene_pos, vec2 scene_pos)
 {
     vec2 derivative = fwidth(scene_pos);
     float min_x = scene_rect_min.x;
     float max_x = scene_rect_max.x;
     float min_y = scene_rect_min.y;
     float max_y = scene_rect_max.y;
-    float to_v_pixel = min((scene_pos.x - min_x) / derivative.x, (max_x - scene_pos.x) /derivative.x);
-    float to_h_pixel = min((scene_pos.y - min_y) / derivative.y, (max_y - scene_pos.y) /derivative.y);
-    return to_h_pixel < outline_width || to_v_pixel < outline_width;
-}
-
-bool gap(vec2 origin_scene_pos, vec2 scene_pos)
-{
-
+    float to_y_pixel = min((scene_pos.x - min_x) / derivative.x, (max_x - scene_pos.x) /derivative.x);
+    float to_x_pixel = min((scene_pos.y - min_y) / derivative.y, (max_y - scene_pos.y) /derivative.y);
+    bool is_in_y_outline = to_y_pixel < outline_width;
+    bool is_in_x_outline = to_x_pixel < outline_width;
+    if(is_in_y_outline || is_in_x_outline)
+    {
+        if(mode == DASH_OUTLINE)
+        {
+            if(is_in_y_outline)
+            {
+                float to_origin_x_pixel = (scene_pos.y - origin_scene_pos.y) / derivative.y;
+                if(fract(to_origin_x_pixel / (dash_size + gap_size)) > dash_size / (dash_size + gap_size))
+                    return false;
+            }
+            if(is_in_x_outline)
+            {
+                float to_origin_y_pixel = (scene_pos.x - origin_scene_pos.x) / derivative.x;
+                if(fract(to_origin_y_pixel / (dash_size + gap_size)) > dash_size / (dash_size + gap_size))
+                    return false;
+            }
+        }
+        return true;
+    }
 }
 
 void main()
 {
     vec2 scene_rect_min = ndc2world(rect_min * 2.0 - 1.0, view_matrix, projection_matrix);
     vec2 scene_rect_max = ndc2world(rect_max * 2.0 - 1.0, view_matrix, projection_matrix);
-    bool is_outline = outline(scene_rect_min, scene_rect_max, scene_pos);
+    bool is_outline = mode == NO_OUTLINE ? false : outline(scene_rect_min, scene_rect_max, scene_rect_min, scene_pos);
     if(is_outline)
     {
-        
+        frag_color = outline_color;
     }
     else
     {

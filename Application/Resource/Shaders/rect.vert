@@ -35,7 +35,7 @@ vec4 ndc2world(vec4 p_ndc, mat4 view, mat4 proj)
 
 void main()
 {
-    vec4 p_ndc = vec4(get_ndc_vertex(gl_VertexID), 1.0, 1.0);
+    vec4 p_ndc = vec4(get_ndc_vertex(gl_VertexID), -1.0, 1.0);
     vec4 p_scene = ndc2world(p_ndc, view_matrix, projection_matrix);
     gl_Position = p_ndc;
     scene_pos = p_scene.xy;
