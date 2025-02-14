@@ -5,10 +5,10 @@ out vec4 frag_color;
 
 uniform bool draw_x_axis;
 uniform bool draw_y_axis;
+uniform float axes_width;
 
 float min_cell_size = 0.1f;
-float min_cell_pixel_size = 5.f;
-float line_width = 2.f;
+float min_cell_pixel = 5.f;
 
 vec3 thick_color = vec3(0.4, 0.4, 0.4);
 vec3 thin_color = vec3(0.3, 0.3, 0.3);
@@ -45,14 +45,14 @@ vec4 grid(vec2 frag_pos)
 {
     vec2 derivative = fwidth(frag_pos);
 
-    float lod = max(0.0, log10((max_vec2(derivative) * min_cell_pixel_size) / min_cell_size) + 1.0);
+    float lod = max(0.0, log10((max_vec2(derivative) * min_cell_pixel) / min_cell_size) + 1.0);
     float fade = fract(lod);
     
     float lod0 = min_cell_size * pow(10, floor(lod));
     float lod1 = lod0 * 10;
     float lod2 = lod1 * 10;
     
-    float half_line_width = line_width / 2.f;
+    float half_line_width = axes_width / 2.f;
 
     float alpha0 = 1.0 - min_vec2(clamp(remain_vec2(frag_pos, lod0) / derivative / half_line_width, 0.0, 1.0));
     float alpha1 = 1.0 - min_vec2(clamp(remain_vec2(frag_pos, lod1) / derivative / half_line_width, 0.0, 1.0));

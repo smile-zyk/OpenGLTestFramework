@@ -6,6 +6,7 @@
 #include "camera_2d.h"
 #include "rect.h"
 #include "vertex_array.h"
+#include <glm/fwd.hpp>
 
 namespace Test
 {
@@ -23,6 +24,30 @@ namespace Test
 		void OnMouseScroll(double x, double y) override;
 		void OnKeyPress(int key, int scancode, int action, int mods) override;
     private:
+        struct GridShaderParameter
+        {
+            bool draw_x_axis{true};
+            bool draw_y_axis{true};
+            float axes_width{2.f};
+        };
+
+        enum RectMode
+        {
+            kNoOutline,
+            kSolidOutline,
+            kDashOutline
+        };
+
+        struct RectShaderParameter
+        {
+            int mode{kDashOutline};
+            float dash_size{8.f};
+            float gap_size{4.f};
+            float outline_width{2.f};
+            glm::vec4 outline_color{0.8f, 0.8f, 0.8f, 0.8f};
+            glm::vec4 filled_color{0.6f, 0.6f, 0.6f, 0.5f};
+        };
+
         Camera2D camera_;
         glinterface::ShaderProgram grid_shader_;
         glinterface::ShaderProgram rect_shader_;
@@ -34,5 +59,7 @@ namespace Test
 		bool first_pressed = true;
 		glm::vec2 origin_pressed_pos_ = { 0.f,0.f };
         Rect select_rect_;
+        GridShaderParameter grid_shader_parameter_;
+        RectShaderParameter rect_shader_parameter_;
     };
 }

@@ -9,16 +9,15 @@ uniform mat4 projection_matrix;
 uniform vec2 rect_min;
 uniform vec2 rect_max;
 uniform int mode;
+uniform float dash_size;
+uniform float gap_size;
+uniform float outline_width;
+uniform vec4 outline_color;
+uniform vec4 filled_color;
 
 const int NO_OUTLINE = 0;
 const int SOLID_OUTLINE = 1;
 const int DASH_OUTLINE = 2;
-
-float dash_size = 20.f;
-float gap_size = 10.f;
-float outline_width = 5.f;
-vec4 outline_color = vec4(0.8f, 0.8f, 0.8f, 0.8f);
-vec4 filled_color = vec4(0.6f, 0.6f, 0.6f, 0.5);
 
 float max_vec2(vec2 v)
 {

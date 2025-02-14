@@ -2,7 +2,7 @@
 #include "glcommon.h"
 #include "rect.h"
 #include "test_base.h"
-#include <cstddef>
+#include <cmath>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/fwd.hpp>
 #include <imgui.h>
@@ -46,8 +46,9 @@ namespace Test
         grid_shader_.use();
         grid_shader_.set_uniform_value("view_matrix", camera_.view_matrix());
         grid_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
-        grid_shader_.set_uniform_value("draw_x_axis", true);
-        grid_shader_.set_uniform_value("draw_y_axis", true);
+        grid_shader_.set_uniform_value("draw_x_axis", grid_shader_parameter_.draw_x_axis);
+        grid_shader_.set_uniform_value("draw_y_axis", grid_shader_parameter_.draw_y_axis);
+        grid_shader_.set_uniform_value("axes_width", grid_shader_parameter_.axes_width);
         grid_vertex_array_.bind();
         gl_interface_.draw_arrays(GL_TRIANGLES, 6);
 
@@ -58,17 +59,42 @@ namespace Test
             rect_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
             rect_shader_.set_uniform_value("rect_min", select_rect_.GetMin());
             rect_shader_.set_uniform_value("rect_max", select_rect_.GetMax());
-            rect_shader_.set_uniform_value("mode", 2);
+            rect_shader_.set_uniform_value("mode", rect_shader_parameter_.mode);
+            rect_shader_.set_uniform_value("dash_size", rect_shader_parameter_.dash_size);
+            rect_shader_.set_uniform_value("gap_size", rect_shader_parameter_.gap_size);
+            rect_shader_.set_uniform_value("outline_width", rect_shader_parameter_.outline_width);
+            rect_shader_.set_uniform_value("outline_color", rect_shader_parameter_.outline_color);
+            rect_shader_.set_uniform_value("filled_color", rect_shader_parameter_.filled_color);
             rect_vertex_array_.bind();
             gl_interface_.draw_arrays(GL_TRIANGLES, 6);
         }
     }
+    
+    const char* select_rect_modes[] = {"NoOutline", "SolidOutline", "DashOutline"};
     
     void Test2D::OnImGuiRender()
     {
         glm::vec2 min = select_rect_.GetMin();
         glm::vec2 max = select_rect_.GetMax();
         ImGui::Text("rect is min(%.2f, %.2f), max(%.2f, %.2f)", min.x, min.y, max.x, max.y);
+        ImGui::BeginGroup();
+        ImGui::Text("Grid");
+        ImGui::Separator();
+        ImGui::Checkbox("X Axis", &grid_shader_parameter_.draw_x_axis);
+        ImGui::SameLine();
+        ImGui::Checkbox("Y Axis", &grid_shader_parameter_.draw_y_axis);
+        ImGui::DragFloat("Axes Width", &grid_shader_parameter_.axes_width, 0.1, 2, 5);
+        ImGui::EndGroup();
+        ImGui::BeginGroup();
+        ImGui::Text("Select Rect");
+        ImGui::Separator();
+        ImGui::Combo("Mode", &rect_shader_parameter_.mode, select_rect_modes, IM_ARRAYSIZE(select_rect_modes));
+        ImGui::DragFloat("Dash Size", &rect_shader_parameter_.dash_size, 0.1, 1, 20);
+        ImGui::DragFloat("Gap Size", &rect_shader_parameter_.gap_size, 0.1, 1, 10);
+        ImGui::DragFloat("Outline Width", &rect_shader_parameter_.outline_width, 0.1, 2, 5);
+        ImGui::ColorEdit4("Outline Color", &rect_shader_parameter_.outline_color.x);
+        ImGui::ColorEdit4("Filled Color", &rect_shader_parameter_.filled_color.x);
+        ImGui::EndGroup();
     }
     
     void Test2D::OnWindowResize(int width, int height)
