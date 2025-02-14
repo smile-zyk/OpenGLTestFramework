@@ -3,12 +3,12 @@
 
 glm::vec2 Rect::GetMin() const
 {
-    return glm::clamp(glm::vec2{std::fmin(p1.x, p2.x), std::fmin(p1.y, p2.y)}, 0.f, 1.f);
+    return glm::vec2{std::fmin(p1.x, p2.x), std::fmin(p1.y, p2.y)};
 }
 
 glm::vec2 Rect::GetMax() const
 {
-    return glm::clamp(glm::vec2{std::fmax(p1.x, p2.x), std::fmax(p1.y, p2.y)}, 0.f, 1.f);
+    return glm::vec2{std::fmax(p1.x, p2.x), std::fmax(p1.y, p2.y)};
 }
 
 void Rect::Reset()

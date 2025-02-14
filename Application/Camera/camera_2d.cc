@@ -13,7 +13,7 @@ Camera2D::Camera2D(int width, int height, float near, float far): width_(width),
 void Camera2D::Move(glm::vec2 motion)
 {
     glm::vec2 factor(width_ / zoom_, height_ / zoom_);
-    center_ += motion * factor;
+    center_ -= motion * factor;
     UpdateViewMatrix();
 }
 
@@ -23,7 +23,7 @@ void Camera2D::Zoom(float ratio)
     UpdateProjectionMatrix();
 }
 
-void Camera2D::SetViewPort(int width, int height)
+void Camera2D::SetWindowSize(int width, int height)
 {
     width_ = width;
     height_ = height;
@@ -39,7 +39,7 @@ void Camera2D::SetNearFar(float near, float far)
 
 void Camera2D::UpdateViewMatrix()
 {
-    view_matrix_ = glm::translate(glm::mat4(1.0), glm::vec3(center_.x, center_.y, 0));
+    view_matrix_ = glm::translate(glm::mat4(1.0), glm::vec3(-center_.x, -center_.y, 0));
 }
 
 void Camera2D::UpdateProjectionMatrix()
@@ -51,6 +51,11 @@ void Camera2D::set_center(glm::vec2 center)
 {
     center_ = center;
     UpdateViewMatrix();
+}
+
+Rect Camera2D::GetViewport()
+{
+    return {glm::vec2{-width_ / (2.f * zoom_), -height_ / (2.f * zoom_)} + center_, glm::vec2{width_ / (2.f * zoom_), height_ / (2.f * zoom_)} + center_};
 }
 
 glm::vec2 Camera2D::center()

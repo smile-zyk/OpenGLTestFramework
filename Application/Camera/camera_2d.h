@@ -1,6 +1,8 @@
 #pragma once
 
 #include "camera.h"
+#include "rect.h"
+#include <glm/fwd.hpp>
 #include <glm/glm.hpp>
 
 class Camera2D : public Camera
@@ -9,11 +11,12 @@ public:
     Camera2D(int width, int height, float near, float far);
     void Move(glm::vec2 motion);
     void Zoom(float zoom);
-    void SetViewPort(int width, int height);
+    void SetWindowSize(int width, int height);
     void SetNearFar(float near, float far);
     void UpdateViewMatrix() override;
     void UpdateProjectionMatrix() override;
     void set_center(glm::vec2 center);
+    Rect GetViewport();
     glm::vec2 center();
 private:
     glm::vec2 center_{};

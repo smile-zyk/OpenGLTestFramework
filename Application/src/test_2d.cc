@@ -2,9 +2,6 @@
 #include "glcommon.h"
 #include "rect.h"
 #include "test_base.h"
-#include <cmath>
-#include <glm/ext/vector_float3.hpp>
-#include <glm/fwd.hpp>
 #include <imgui.h>
 
 using namespace glinterface;
@@ -76,22 +73,26 @@ namespace Test
     {
         glm::vec2 min = select_rect_.GetMin();
         glm::vec2 max = select_rect_.GetMax();
-        ImGui::Text("rect is min(%.2f, %.2f), max(%.2f, %.2f)", min.x, min.y, max.x, max.y);
+        ImGui::Text("Select Rect is min(%.2f, %.2f), max(%.2f, %.2f)", min.x, min.y, max.x, max.y);
+        Rect viewport = camera_.GetViewport();
+        glm::vec2 viewport_min = viewport.GetMin();
+        glm::vec2 viewport_max = viewport.GetMax();
+        ImGui::Text("Viewport is (%.2f, %.2f), (%.2f, %.2f)", viewport_min.x, viewport_min.y, viewport_max.x, viewport_max.y);
         ImGui::BeginGroup();
         ImGui::Text("Grid");
         ImGui::Separator();
         ImGui::Checkbox("X Axis", &grid_shader_parameter_.draw_x_axis);
         ImGui::SameLine();
         ImGui::Checkbox("Y Axis", &grid_shader_parameter_.draw_y_axis);
-        ImGui::DragFloat("Axes Width", &grid_shader_parameter_.axes_width, 0.1, 2, 5);
+        ImGui::DragFloat("Axes Width", &grid_shader_parameter_.axes_width, 0.1f, 2.f, 5.f);
         ImGui::EndGroup();
         ImGui::BeginGroup();
         ImGui::Text("Select Rect");
         ImGui::Separator();
         ImGui::Combo("Mode", &rect_shader_parameter_.mode, select_rect_modes, IM_ARRAYSIZE(select_rect_modes));
-        ImGui::DragFloat("Dash Size", &rect_shader_parameter_.dash_size, 0.1, 1, 20);
-        ImGui::DragFloat("Gap Size", &rect_shader_parameter_.gap_size, 0.1, 1, 10);
-        ImGui::DragFloat("Outline Width", &rect_shader_parameter_.outline_width, 0.1, 2, 5);
+        ImGui::DragFloat("Dash Size", &rect_shader_parameter_.dash_size, 0.1f, 1.f, 20.f);
+        ImGui::DragFloat("Gap Size", &rect_shader_parameter_.gap_size, 0.1f, 1.f, 10.f);
+        ImGui::DragFloat("Outline Width", &rect_shader_parameter_.outline_width, 0.1f, 2.f, 5.f);
         ImGui::ColorEdit4("Outline Color", &rect_shader_parameter_.outline_color.x);
         ImGui::ColorEdit4("Filled Color", &rect_shader_parameter_.filled_color.x);
         ImGui::EndGroup();
@@ -99,7 +100,7 @@ namespace Test
     
     void Test2D::OnWindowResize(int width, int height)
     {
-        camera_.SetViewPort(width, height);
+        camera_.SetWindowSize(width, height);
     }
 
     void Test2D::OnMouseClick(int button, int action, int mods)
@@ -130,7 +131,7 @@ namespace Test
             }
         }
     }
-    
+
     void Test2D::OnMouseMove(double x, double y)
     {
         if (mouse_left_pressed_ || mouse_right_pressed_)
