@@ -4,6 +4,7 @@ uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
 uniform vec2 rect_min;
 uniform vec2 rect_max;
+uniform float near;
 
 out vec2 scene_pos;
 
@@ -35,7 +36,7 @@ vec4 ndc2world(vec4 p_ndc, mat4 view, mat4 proj)
 
 void main()
 {
-    vec4 p_ndc = vec4(get_ndc_vertex(gl_VertexID), -1.0, 1.0);
+    vec4 p_ndc = vec4(get_ndc_vertex(gl_VertexID), near + 0.001, 1.0);
     vec4 p_scene = ndc2world(p_ndc, view_matrix, projection_matrix);
     gl_Position = p_ndc;
     scene_pos = p_scene.xy;

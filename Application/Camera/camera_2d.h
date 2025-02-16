@@ -1,7 +1,7 @@
 #pragma once
 
 #include "camera.h"
-#include "rect.h"
+#include "boundingbox.h"
 #include <glm/fwd.hpp>
 #include <glm/glm.hpp>
 
@@ -16,8 +16,10 @@ public:
     void UpdateViewMatrix() override;
     void UpdateProjectionMatrix() override;
     void set_center(glm::vec2 center);
-    Rect GetViewport();
+    BoundingBox GetViewport();
     glm::vec2 center();
+    float near();
+    float far();
 private:
     glm::vec2 center_{};
     float zoom_{1.f};

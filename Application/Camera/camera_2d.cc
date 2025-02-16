@@ -1,4 +1,5 @@
 #include "camera_2d.h"
+#include "boundingbox.h"
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/vector_float3.hpp>
@@ -53,7 +54,7 @@ void Camera2D::set_center(glm::vec2 center)
     UpdateViewMatrix();
 }
 
-Rect Camera2D::GetViewport()
+BoundingBox Camera2D::GetViewport()
 {
     return {glm::vec2{-width_ / (2.f * zoom_), -height_ / (2.f * zoom_)} + center_, glm::vec2{width_ / (2.f * zoom_), height_ / (2.f * zoom_)} + center_};
 }
@@ -61,4 +62,14 @@ Rect Camera2D::GetViewport()
 glm::vec2 Camera2D::center()
 {
     return center_;
+}
+
+float Camera2D::near()
+{
+    return near_;
+}
+
+float Camera2D::far()
+{
+    return far_;
 }

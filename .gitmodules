@@ -1,0 +1,3 @@
+[submodule "thirdparty/RTree"]
+	path = thirdparty/RTree
+	url = https://github.com/nushoin/RTree.git

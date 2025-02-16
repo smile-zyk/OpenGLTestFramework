@@ -4,6 +4,7 @@ out vec3 frag_pos;
 
 uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
+uniform float far;
 
 // opengl ndc space near plane is -1
 vec2 grid_plane[6] = vec2[]
@@ -23,6 +24,6 @@ vec3 ndc2world(vec3 p_ndc, mat4 view, mat4 proj)
 void main() 
 {
     vec2 p = grid_plane[gl_VertexID];
-    frag_pos = ndc2world(vec3(p.xy, 1.0), view_matrix, projection_matrix);
-    gl_Position = vec4(p, 0.0, 1.0);
+    frag_pos = ndc2world(vec3(p.xy, far - 0.001), view_matrix, projection_matrix);
+    gl_Position = vec4(p, far - 0.001, 1.0);
 }

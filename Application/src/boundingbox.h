@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <glad/glad.h>
 
-struct Rect
+struct BoundingBox
 {
     glm::vec2 p1{0.f};
     glm::vec2 p2{0.f};

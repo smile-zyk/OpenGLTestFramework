@@ -9,7 +9,7 @@
                 "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": true,
                 "CMAKE_TOOLCHAIN_FILE": {
-                    "value": "C:/msys64/vcpkg/scripts/buildsystems/vcpkg.cmake",
+                    "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
                     "type": "FILEPATH"
                 }
             }

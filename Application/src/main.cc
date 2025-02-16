@@ -95,7 +95,7 @@ int main()
 		current_test = test_menu;
 
 		test_menu->RegisterTest<Test::TestVegetation>("Vegetation Demo");
-		test_menu->RegisterTest<Test::Test2D>("2D");
+		test_menu->RegisterTest<Test::Test2D>("2d Rendering Demo");
 
 		glfwSetFramebufferSizeCallback(window, OnWindowResize);
 		glfwSetScrollCallback(window, OnMouseScroll);

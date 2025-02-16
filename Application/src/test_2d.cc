@@ -1,10 +1,13 @@
 #include "test_2d.h"
 #include "glcommon.h"
-#include "rect.h"
+#include "boundingbox.h"
 #include "test_base.h"
 #include <imgui.h>
 
 using namespace glinterface;
+
+const int kLayer = 100;
+const int kElementNumber = 10000;
 
 namespace Test
 {
@@ -34,7 +37,6 @@ namespace Test
     
     void Test2D::OnUpdate(double deltaTime)
     {
-        
     }
 
     void Test2D::OnRender()
@@ -43,6 +45,7 @@ namespace Test
         grid_shader_.use();
         grid_shader_.set_uniform_value("view_matrix", camera_.view_matrix());
         grid_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
+        grid_shader_.set_uniform_value("far", camera_.far());
         grid_shader_.set_uniform_value("draw_x_axis", grid_shader_parameter_.draw_x_axis);
         grid_shader_.set_uniform_value("draw_y_axis", grid_shader_parameter_.draw_y_axis);
         grid_shader_.set_uniform_value("axes_width", grid_shader_parameter_.axes_width);
@@ -54,6 +57,7 @@ namespace Test
             rect_shader_.use();
             rect_shader_.set_uniform_value("view_matrix", camera_.view_matrix());
             rect_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
+            rect_shader_.set_uniform_value("near", camera_.near());
             rect_shader_.set_uniform_value("rect_min", select_rect_.GetMin());
             rect_shader_.set_uniform_value("rect_max", select_rect_.GetMax());
             rect_shader_.set_uniform_value("mode", rect_shader_parameter_.mode);
@@ -74,7 +78,7 @@ namespace Test
         glm::vec2 min = select_rect_.GetMin();
         glm::vec2 max = select_rect_.GetMax();
         ImGui::Text("Select Rect is min(%.2f, %.2f), max(%.2f, %.2f)", min.x, min.y, max.x, max.y);
-        Rect viewport = camera_.GetViewport();
+        BoundingBox viewport = camera_.GetViewport();
         glm::vec2 viewport_min = viewport.GetMin();
         glm::vec2 viewport_max = viewport.GetMax();
         ImGui::Text("Viewport is (%.2f, %.2f), (%.2f, %.2f)", viewport_min.x, viewport_min.y, viewport_max.x, viewport_max.y);
@@ -170,6 +174,29 @@ namespace Test
         if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
         {
             camera_.set_center({0.f, 0.f});
+        }
+    }
+    
+    void Test2D::DrawShape()
+    {
+        
+    }
+    
+    void Test2D::DrawCircle()
+    {
+        
+    }
+    
+    void Test2D::DrawRectangle()
+    {
+        
+    }
+    
+    void Test2D::CreateRandomRectangle()
+    {
+        for(int i = 0; i < 10; i++)
+        {
+            
         }
     }
 }

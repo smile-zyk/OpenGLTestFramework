@@ -17,6 +17,8 @@
           "opengl3-binding",
           "glfw-binding"
         ]
-      }
+      },
+      "zlib",
+      "qhull"
     ]
 }
