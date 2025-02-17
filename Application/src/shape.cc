@@ -29,7 +29,12 @@ std::string Rectangle::ToString() const
 
 ShapeType Rectangle::GetShapeType() const 
 {
-    return ShapeType::Rectangle;
+    return ShapeType::kRectangle;
+}
+
+void Rectangle::Accept(ShapeRenderer* renderer)
+{
+    renderer->Draw(this);
 }
 
 Circle::Circle(float center_x, float center_y, float radius_)
@@ -47,7 +52,7 @@ Circle::Circle(const glm::vec2& center_, float radius_)
 
 ShapeType Circle::GetShapeType() const 
 {
-    return ShapeType::Circle;
+    return ShapeType::kCircle;
 }
 
 BoundingBox Circle::GetBoundingBox() const 
@@ -60,4 +65,9 @@ std::string Circle::ToString() const
     std::stringstream ss;
     ss << "Circle: center(" << center.x << ',' << center.y << ") radius: " << radius << ')';
     return ss.str();
+}
+
+void Circle::Accept(ShapeRenderer* renderer)
+{
+    renderer->Draw(this);
 }

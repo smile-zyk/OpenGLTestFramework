@@ -42,41 +42,16 @@ namespace Test
     void Test2D::OnRender()
     {
         gl_interface_.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        grid_shader_.use();
-        grid_shader_.set_uniform_value("view_matrix", camera_.view_matrix());
-        grid_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
-        grid_shader_.set_uniform_value("far", camera_.far());
-        grid_shader_.set_uniform_value("draw_x_axis", grid_shader_parameter_.draw_x_axis);
-        grid_shader_.set_uniform_value("draw_y_axis", grid_shader_parameter_.draw_y_axis);
-        grid_shader_.set_uniform_value("axes_width", grid_shader_parameter_.axes_width);
-        grid_vertex_array_.bind();
-        gl_interface_.draw_arrays(GL_TRIANGLES, 6);
-
-        if(select_rect_.IsValid())
-        {
-            rect_shader_.use();
-            rect_shader_.set_uniform_value("view_matrix", camera_.view_matrix());
-            rect_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
-            rect_shader_.set_uniform_value("near", camera_.near());
-            rect_shader_.set_uniform_value("rect_min", select_rect_.GetMin());
-            rect_shader_.set_uniform_value("rect_max", select_rect_.GetMax());
-            rect_shader_.set_uniform_value("mode", rect_shader_parameter_.mode);
-            rect_shader_.set_uniform_value("dash_size", rect_shader_parameter_.dash_size);
-            rect_shader_.set_uniform_value("gap_size", rect_shader_parameter_.gap_size);
-            rect_shader_.set_uniform_value("outline_width", rect_shader_parameter_.outline_width);
-            rect_shader_.set_uniform_value("outline_color", rect_shader_parameter_.outline_color);
-            rect_shader_.set_uniform_value("filled_color", rect_shader_parameter_.filled_color);
-            rect_vertex_array_.bind();
-            gl_interface_.draw_arrays(GL_TRIANGLES, 6);
-        }
+        RenderScene();
+        RenderSelectArea(select_area_);
     }
     
-    const char* select_rect_modes[] = {"NoOutline", "SolidOutline", "DashOutline"};
+    const char* select_area_modes[] = {"NoOutline", "SolidOutline", "DashOutline"};
     
     void Test2D::OnImGuiRender()
     {
-        glm::vec2 min = select_rect_.GetMin();
-        glm::vec2 max = select_rect_.GetMax();
+        glm::vec2 min = select_area_.GetMin();
+        glm::vec2 max = select_area_.GetMax();
         ImGui::Text("Select Rect is min(%.2f, %.2f), max(%.2f, %.2f)", min.x, min.y, max.x, max.y);
         BoundingBox viewport = camera_.GetViewport();
         glm::vec2 viewport_min = viewport.GetMin();
@@ -93,7 +68,7 @@ namespace Test
         ImGui::BeginGroup();
         ImGui::Text("Select Rect");
         ImGui::Separator();
-        ImGui::Combo("Mode", &rect_shader_parameter_.mode, select_rect_modes, IM_ARRAYSIZE(select_rect_modes));
+        ImGui::Combo("Mode", &rect_shader_parameter_.mode, select_area_modes, IM_ARRAYSIZE(select_area_modes));
         ImGui::DragFloat("Dash Size", &rect_shader_parameter_.dash_size, 0.1f, 1.f, 20.f);
         ImGui::DragFloat("Gap Size", &rect_shader_parameter_.gap_size, 0.1f, 1.f, 10.f);
         ImGui::DragFloat("Outline Width", &rect_shader_parameter_.outline_width, 0.1f, 2.f, 5.f);
@@ -131,7 +106,7 @@ namespace Test
             else if (action == GLFW_RELEASE)
             {
                 mouse_left_pressed_ = false;
-                select_rect_.Reset();
+                select_area_.Reset();
             }
         }
     }
@@ -146,7 +121,7 @@ namespace Test
             {
                 origin_pressed_pos_ = { currentX, currentY };
                 if(mouse_left_pressed_)
-                    select_rect_.p1 = {currentX / screen_width, 1 - currentY / screen_height};
+                    select_area_.p1 = {currentX / screen_width, 1 - currentY / screen_height};
                 first_pressed = false;
             }
             if(mouse_right_pressed_)
@@ -159,7 +134,7 @@ namespace Test
             }
             else if(mouse_left_pressed_)
             {
-                select_rect_.p2 = {currentX / screen_width, 1 - currentY / screen_height};
+                select_area_.p2 = {currentX / screen_width, 1 - currentY / screen_height};
             }
         }
     }
@@ -177,26 +152,60 @@ namespace Test
         }
     }
     
-    void Test2D::DrawShape()
+    void Test2D::Draw(Shape* shape)
+    {
+        shape->Accept(this);
+    }
+    
+    void Test2D::Draw(Rectangle* rect)
     {
         
     }
     
-    void Test2D::DrawCircle()
+    void Test2D::Draw(Circle* circle)
     {
         
     }
     
-    void Test2D::DrawRectangle()
+    void Test2D::RenderShapes()
     {
-        
-    }
-    
-    void Test2D::CreateRandomRectangle()
-    {
-        for(int i = 0; i < 10; i++)
+        for(int i = 0; i < shape_list_.size(); i++)
         {
-            
+            Draw(shape_list_[i].get());
+        }
+    }
+    
+    void Test2D::RenderScene()
+    {
+        grid_shader_.use();
+        grid_shader_.set_uniform_value("view_matrix", camera_.view_matrix());
+        grid_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
+        grid_shader_.set_uniform_value("far", camera_.far());
+        grid_shader_.set_uniform_value("draw_x_axis", grid_shader_parameter_.draw_x_axis);
+        grid_shader_.set_uniform_value("draw_y_axis", grid_shader_parameter_.draw_y_axis);
+        grid_shader_.set_uniform_value("axes_width", grid_shader_parameter_.axes_width);
+        grid_vertex_array_.bind();
+        gl_interface_.draw_arrays(GL_TRIANGLES, 6);
+    }
+    
+    void Test2D::RenderSelectArea(const BoundingBox& select_area)
+    {
+        if(select_area.IsValid())
+        {
+            rect_shader_.use();
+            rect_shader_.set_uniform_value("view_matrix", camera_.view_matrix());
+            rect_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
+            rect_shader_.set_uniform_value("near", camera_.near());
+            rect_shader_.set_uniform_value("rect_min", select_area.GetMin());
+            rect_shader_.set_uniform_value("rect_max", select_area.GetMax());
+            rect_shader_.set_uniform_value("mode", rect_shader_parameter_.mode);
+            rect_shader_.set_uniform_value("dash_size", rect_shader_parameter_.dash_size);
+            rect_shader_.set_uniform_value("gap_size", rect_shader_parameter_.gap_size);
+            rect_shader_.set_uniform_value("outline_width", rect_shader_parameter_.outline_width);
+            rect_shader_.set_uniform_value("outline_color", rect_shader_parameter_.outline_color);
+            rect_shader_.set_uniform_value("filled_color", rect_shader_parameter_.filled_color);
+            rect_vertex_array_.bind();
+            gl_interface_.draw_arrays(GL_TRIANGLES, 6);
         }
     }
 }

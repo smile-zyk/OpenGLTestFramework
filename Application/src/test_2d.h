@@ -1,16 +1,21 @@
 #pragma once
 
 #include "buffer.h"
+#include "boundingbox.h"
+#include "glcommon.h"
 #include "shader_program.h"
+#include "shape.h"
 #include "test_base.h"
 #include "camera_2d.h"
 #include "boundingbox.h"
 #include "vertex_array.h"
-#include <glm/fwd.hpp>
+
+#include <memory>
+#include <vector>
 
 namespace Test
 {
-    class Test2D : public TestBase
+    class Test2D : public TestBase, ShapeRenderer
     {
     public:
         Test2D();
@@ -32,7 +37,7 @@ namespace Test
             int mode;
         };
 
-        struct Item
+        struct RenderItem
         {
             int offset;
             std::vector<GLuint> indices;
@@ -62,31 +67,38 @@ namespace Test
             glm::vec4 filled_color{0.6f, 0.6f, 0.6f, 0.5f};
         };
 
-        void DrawShape();
+        void Draw(Shape* shape);
 
-        void DrawCircle();
+        void Draw(Rectangle* rect) override;
 
-        void DrawRectangle();
+        void Draw(Circle* circle) override;
 
-        void CreateRandomRectangle();
+        void RenderShapes();
 
-        Camera2D camera_;
-        glinterface::ShaderProgram grid_shader_;
-        glinterface::ShaderProgram rect_shader_;
-        glinterface::VertexArray grid_vertex_array_;
-        glinterface::VertexArray rect_vertex_array_;
+        void RenderScene();
+
+        void RenderSelectArea(const BoundingBox& select_area);
+
         void* rect_vertex_buffer_map_;
         bool mouse_left_pressed_ = false;
 		bool mouse_right_pressed_ = false;
 		bool first_pressed = true;
 		glm::vec2 origin_pressed_pos_ = { 0.f,0.f };
-        BoundingBox select_rect_;
+        std::vector<std::unique_ptr<Shape>> shape_list_;
+        
+        BoundingBox select_area_;
         GridShaderParameter grid_shader_parameter_;
         RectShaderParameter rect_shader_parameter_;
+        Camera2D camera_;
 
-        glinterface::VertexArray random_rect_vertex_array_;
-        glinterface::Buffer random_rect_vertex_buffer_;
-        glinterface::Buffer random_rect_index_buffer_;
-        glinterface::Buffer random_rect_render_buffer_;
+        // opengl objects
+        glinterface::ShaderProgram grid_shader_;
+        glinterface::ShaderProgram rect_shader_;
+        glinterface::VertexArray grid_vertex_array_;
+        glinterface::VertexArray rect_vertex_array_;
+        glinterface::VertexArray shape_vertex_array_;
+        glinterface::Buffer shape_vertex_buffer_;
+        glinterface::Buffer shape_index_buffer_;
+        glinterface::Buffer shape_render_buffer_;
     };
 }

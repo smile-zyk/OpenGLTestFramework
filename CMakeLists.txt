@@ -14,4 +14,3 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
 add_subdirectory(Application)
 add_subdirectory(glinterface)
-add_subdirectory(thirdparty/gdstk)

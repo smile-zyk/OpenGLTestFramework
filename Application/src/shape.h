@@ -6,9 +6,11 @@
 
 enum ShapeType
 {
-    Rectangle,
-    Circle,
+    kRectangle,
+    kCircle,
 };
+
+class ShapeRenderer;
 
 struct Shape
 {
@@ -17,6 +19,7 @@ public:
     virtual BoundingBox GetBoundingBox() const = 0;
     virtual std::string ToString() const = 0;
     virtual ShapeType GetShapeType() const = 0; 
+    virtual void Accept(ShapeRenderer* renderer) = 0;
 protected:
     Shape() = default;
 };
@@ -28,6 +31,7 @@ struct Rectangle : public Shape
     BoundingBox GetBoundingBox() const override;
     std::string ToString() const override;
     ShapeType GetShapeType() const override;
+    void Accept(ShapeRenderer* renderer) override;
     glm::vec2 origin{0};
     glm::vec2 size{0};
 };
@@ -40,6 +44,14 @@ public:
     ShapeType GetShapeType() const override;
     BoundingBox GetBoundingBox() const override;
     std::string ToString() const override;
+    void Accept(ShapeRenderer* renderer) override;
     glm::vec2 center;
     float radius;
+};
+
+class ShapeRenderer
+{
+public:
+    virtual void Draw(Circle* circle) = 0;
+    virtual void Draw(Rectangle* rect) = 0;
 };
