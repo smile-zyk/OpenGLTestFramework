@@ -12,6 +12,7 @@
 
 #include <memory>
 #include <vector>
+#include <uuid.h>
 
 namespace Test
 {
@@ -35,9 +36,10 @@ namespace Test
             glm::vec3 position;
             glm::vec4 color;
             int mode;
+            glm::vec3 parameter; // for different shape
         };
 
-        struct RenderItem
+        class RenderItem
         {
             int offset;
             std::vector<GLuint> indices;

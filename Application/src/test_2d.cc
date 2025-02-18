@@ -170,9 +170,7 @@ namespace Test
     void Test2D::RenderShapes()
     {
         for(int i = 0; i < shape_list_.size(); i++)
-        {
             Draw(shape_list_[i].get());
-        }
     }
     
     void Test2D::RenderScene()

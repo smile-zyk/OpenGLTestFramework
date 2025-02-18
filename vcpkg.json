@@ -18,7 +18,6 @@
           "glfw-binding"
         ]
       },
-      "zlib",
-      "qhull"
+      "stduuid"
     ]
 }

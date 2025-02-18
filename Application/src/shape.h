@@ -3,6 +3,7 @@
 #include "boundingbox.h"
 #include <glm/glm.hpp>
 #include <string>
+#include <uuid.h>
 
 enum ShapeType
 {
@@ -20,8 +21,11 @@ public:
     virtual std::string ToString() const = 0;
     virtual ShapeType GetShapeType() const = 0; 
     virtual void Accept(ShapeRenderer* renderer) = 0;
+    uuids::uuid uuid();
 protected:
-    Shape() = default;
+    Shape();
+private:
+    uuids::uuid uuid_;
 };
 
 struct Rectangle : public Shape
@@ -49,7 +53,7 @@ public:
     float radius;
 };
 
-class ShapeRenderer
+struct ShapeRenderer
 {
 public:
     virtual void Draw(Circle* circle) = 0;
