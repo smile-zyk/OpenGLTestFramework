@@ -1,13 +1,22 @@
 #include "test_2d.h"
 #include "glcommon.h"
 #include "boundingbox.h"
+#include "shape.h"
 #include "test_base.h"
+#include <algorithm>
+#include <cstddef>
+#include <glm/fwd.hpp>
 #include <imgui.h>
+#include <memory>
+#include <vector>
 
 using namespace glinterface;
 
 const int kLayer = 100;
-const int kElementNumber = 10000;
+const int kRectangleNumber = 1;
+const int kCircleNumber = 0;
+const int kVertexNumber = kRectangleNumber * 4 + kCircleNumber * 3;
+const int kIndexNumber = kRectangleNumber * 6 + kCircleNumber * 3;
 
 namespace Test
 {
@@ -20,14 +29,43 @@ namespace Test
         rect_shader_.attach_shader(std::make_shared<Shader>(GL_VERTEX_SHADER, "..\\..\\Application\\Resource\\Shaders\\rect.vert"));
         rect_shader_.attach_shader(std::make_shared<Shader>(GL_FRAGMENT_SHADER, "..\\..\\Application\\Resource\\Shaders\\rect.frag"));        
         rect_shader_.link();
+        shape_shader_.attach_shader(std::make_shared<Shader>(GL_VERTEX_SHADER, "..\\..\\Application\\Resource\\Shaders\\shape.vert"));
+        shape_shader_.attach_shader(std::make_shared<Shader>(GL_FRAGMENT_SHADER, "..\\..\\Application\\Resource\\Shaders\\shape.frag"));        
+        shape_shader_.link();
 
-        // GLbitfield map_flags = GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_WRITE_BIT;
+        GLbitfield map_flags = GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_WRITE_BIT;
+        shape_vertex_buffer_.allocate_storage(kVertexNumber * sizeof(Vertex), nullptr, map_flags);
+        shape_index_buffer_.allocate_storage(kIndexNumber * sizeof(GLuint), nullptr, map_flags);
+        shape_vertex_buffer_map_ = static_cast<Vertex*>(shape_vertex_buffer_.map_memory_range(0, kVertexNumber * sizeof(Vertex), map_flags));
+        shape_index_buffer_map_ = static_cast<GLuint*>(shape_index_buffer_.map_memory_range(0, kIndexNumber * sizeof(GLuint), map_flags));
+        current_shape_vertex_size = 0;
+        current_shape_index_size = 0;
 
+        shape_vertex_array_.bind_vertex_buffer(0, shape_vertex_buffer_, offsetof(Vertex, position), sizeof(Vertex));
+        shape_vertex_array_.bind_vertex_buffer(1, shape_vertex_buffer_, offsetof(Vertex, color), sizeof(Vertex));
+        shape_vertex_array_.bind_vertex_buffer(2, shape_vertex_buffer_, offsetof(Vertex, mode), sizeof(Vertex));
+        shape_vertex_array_.bind_vertex_buffer(3, shape_vertex_buffer_, offsetof(Vertex, parameter), sizeof(Vertex));
+        shape_vertex_array_.bind_element_buffer(shape_index_buffer_);
+
+        shape_vertex_array_.set_attrib(0, 3, GL_FLOAT, false, 0);
+        shape_vertex_array_.set_attrib(1, 4, GL_FLOAT, false, 0);
+        shape_vertex_array_.set_attrib(2, 1, GL_INT, false, 0);
+        shape_vertex_array_.set_attrib(3, 3, GL_FLOAT, false, 0);
+        shape_vertex_array_.bind_attrib(0, 0);
+        shape_vertex_array_.bind_attrib(1, 1);
+        shape_vertex_array_.bind_attrib(2, 2);
+        shape_vertex_array_.bind_attrib(3, 3);
+        shape_vertex_array_.enable_attrib(0);
+        shape_vertex_array_.enable_attrib(1);
+        shape_vertex_array_.enable_attrib(2);
+        shape_vertex_array_.enable_attrib(3);
+        
         gl_interface_.set_clear_color(0.2f, 0.2f, 0.2f, 1.0f);
         gl_interface_.enable(GL_DEPTH_TEST);
         gl_interface_.enable(GL_BLEND);
-        gl_interface_.enable(GL_CULL_FACE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        CreateShapes();
+        DrawShapes();
     }
     
     Test2D::~Test2D()
@@ -43,6 +81,7 @@ namespace Test
     {
         gl_interface_.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         RenderScene();
+        RenderShapes();
         RenderSelectArea(select_area_);
     }
     
@@ -159,7 +198,50 @@ namespace Test
     
     void Test2D::Draw(Rectangle* rect)
     {
-        
+        std::vector<Vertex> vertices;
+        vertices.reserve(4);
+
+        BoundingBox box = rect->GetBoundingBox();
+        glm::vec2 min = box.GetMin();
+        glm::vec2 max = box.GetMax();
+        glm::vec4 color = rect->color();
+        float layer = rect->layer();
+
+        Vertex v1;
+        v1.position = { min, layer };
+        v1.color = color;
+        v1.mode = kRectangle;
+
+        Vertex v2;
+        v2.position = { max.x, min.y, layer };
+        v2.color = color;
+        v2.mode = kRectangle;
+
+        Vertex v3;
+        v3.position = { max, layer };
+        v3.color = color;
+        v3.mode = kRectangle;
+
+        Vertex v4;
+        v4.position = { min.x, max.y, layer };
+        v4.color = color;
+        v4.mode = kRectangle;
+
+        vertices.emplace_back(v1);
+        vertices.emplace_back(v2);
+        vertices.emplace_back(v3);
+        vertices.emplace_back(v4);
+
+        static GLuint rect_indices[6] = { 0, 1, 2, 0, 2, 3};
+        std::vector<GLuint> indices;
+        indices.resize(6);
+        for(int i = 0; i < 6; i++) indices[i] = current_shape_index_size + rect_indices[i];
+
+        memcpy(&shape_vertex_buffer_map_[current_shape_vertex_size], vertices.data(), 4 * sizeof(Vertex));
+        memcpy(&shape_index_buffer_map_[current_shape_index_size], indices.data(), 6 * sizeof(GLuint));
+    
+        current_shape_vertex_size += 4;
+        current_shape_index_size += 6;
     }
     
     void Test2D::Draw(Circle* circle)
@@ -167,7 +249,7 @@ namespace Test
         
     }
     
-    void Test2D::RenderShapes()
+    void Test2D::DrawShapes()
     {
         for(int i = 0; i < shape_list_.size(); i++)
             Draw(shape_list_[i].get());
@@ -205,5 +287,20 @@ namespace Test
             rect_vertex_array_.bind();
             gl_interface_.draw_arrays(GL_TRIANGLES, 6);
         }
+    }
+    
+    void Test2D::RenderShapes()
+    {
+        shape_shader_.use();
+        shape_shader_.set_uniform_value("view_matrix", camera_.view_matrix());
+        shape_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
+        gl_interface_.draw_elements(GL_TRIANGLES, GL_UNSIGNED_INT, shape_vertex_array_, shape_shader_);
+    }
+    
+    void Test2D::CreateShapes()
+    {
+        auto rect = std::make_unique<Rectangle>(glm::vec2{-100, -100}, glm::vec2{200, 200}, 0.f);
+        rect->set_color(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+        shape_list_.push_back(std::move(rect));
     }
 }

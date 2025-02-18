@@ -56,7 +56,7 @@ void main()
         gl_Position = projection_matrix * view_matrix * tri_pos, 1.0;
         frag_pos = tri_pos.xy;
     }
-    frag_color = frag_color;
+    frag_color = color;
     frag_mode = mode;
     frag_parameter = parameter;
 }

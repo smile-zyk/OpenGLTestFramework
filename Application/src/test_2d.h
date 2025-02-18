@@ -33,16 +33,16 @@ namespace Test
 
         struct Vertex
         {
-            glm::vec3 position;
-            glm::vec4 color;
-            int mode;
-            glm::vec3 parameter; // for different shape
+            glm::vec3 position{};
+            glm::vec4 color{};
+            unsigned int mode{};
+            glm::vec3 parameter{}; // for different shape
         };
 
         class RenderItem
         {
             int offset;
-            std::vector<GLuint> indices;
+            int mode;
         };
 
         struct GridShaderParameter
@@ -75,11 +75,15 @@ namespace Test
 
         void Draw(Circle* circle) override;
 
-        void RenderShapes();
+        void DrawShapes();
 
         void RenderScene();
 
         void RenderSelectArea(const BoundingBox& select_area);
+
+        void RenderShapes();
+
+        void CreateShapes();
 
         void* rect_vertex_buffer_map_;
         bool mouse_left_pressed_ = false;
@@ -96,11 +100,17 @@ namespace Test
         // opengl objects
         glinterface::ShaderProgram grid_shader_;
         glinterface::ShaderProgram rect_shader_;
+        glinterface::ShaderProgram shape_shader_;
         glinterface::VertexArray grid_vertex_array_;
         glinterface::VertexArray rect_vertex_array_;
         glinterface::VertexArray shape_vertex_array_;
         glinterface::Buffer shape_vertex_buffer_;
         glinterface::Buffer shape_index_buffer_;
         glinterface::Buffer shape_render_buffer_;
+
+        Vertex* shape_vertex_buffer_map_;
+        GLuint* shape_index_buffer_map_;
+        unsigned int current_shape_vertex_size{};
+        unsigned int current_shape_index_size{};
     };
 }

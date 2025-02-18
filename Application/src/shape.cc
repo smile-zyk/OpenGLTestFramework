@@ -1,29 +1,29 @@
 #include "shape.h"
 #include <sstream>
 
-Rectangle::Rectangle(float x, float y, float width, float height)
+Rectangle::Rectangle(float x, float y, float width, float height, float layer): Shape(layer)
 {
-    origin.x = x;
-    origin.y = y;
-    size.x = width;
-    size.y = height;       
+    origin_.x = x;
+    origin_.y = y;
+    size_.x = width;
+    size_.y = height;       
 }
 
-Rectangle::Rectangle(const glm::vec2& origin_, const glm::vec2& size_)
+Rectangle::Rectangle(const glm::vec2& origin, const glm::vec2& size, float layer): Shape(layer)
 {
-    origin = origin_;
-    size = size_;
+    origin_ = origin;
+    size_ = size;
 }
 
 BoundingBox Rectangle::GetBoundingBox() const 
 {
-    return {origin, origin + size};
+    return {origin_, origin_ + size_};
 }
 
 std::string Rectangle::ToString() const 
 {
     std::stringstream ss;
-    ss << "Rect: origin(" << origin.x << ',' << origin.y << "), size(" << size.x << ',' << size.y << ')';
+    ss << "Rect: origin(" << origin_.x << ',' << origin_.y << "), size(" << size_.x << ',' << size_.y << ')';
     return ss.str();
 }
 
@@ -37,17 +37,17 @@ void Rectangle::Accept(ShapeRenderer* renderer)
     renderer->Draw(this);
 }
 
-Circle::Circle(float center_x, float center_y, float radius_)
+Circle::Circle(float center_x, float center_y, float radius, float layer) : Shape(layer)
 {
-    center.x = center_x;
-    center.y = center_y;
-    radius = radius_;
+    center_.x = center_x;
+    center_.y = center_y;
+    radius_ = radius;
 }
 
-Circle::Circle(const glm::vec2& center_, float radius_)
+Circle::Circle(const glm::vec2& center, float radius, float layer) : Shape(layer)
 {
-    center = center_;
-    radius = radius_;
+    center_ = center;
+    radius_ = radius;
 }
 
 ShapeType Circle::GetShapeType() const 
@@ -57,13 +57,13 @@ ShapeType Circle::GetShapeType() const
 
 BoundingBox Circle::GetBoundingBox() const 
 {
-    return { center - radius / 2.f, center + radius / 2.f };
+    return { center_ - radius_ / 2.f, center_ + radius_ / 2.f };
 }
 
 std::string Circle::ToString() const 
 {
     std::stringstream ss;
-    ss << "Circle: center(" << center.x << ',' << center.y << ") radius: " << radius << ')';
+    ss << "Circle: center(" << center_.x << ',' << center_.y << ") radius: " << radius_ << ')';
     return ss.str();
 }
 
@@ -72,7 +72,7 @@ void Circle::Accept(ShapeRenderer* renderer)
     renderer->Draw(this);
 }
 
-Shape::Shape()
+Shape::Shape(float layer) : layer_(layer)
 {
     std::random_device rd;
     auto seed_data = std::array<int, std::mt19937::state_size> {};
