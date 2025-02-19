@@ -35,7 +35,7 @@ namespace Test
         {
             glm::vec3 position{};
             glm::vec4 color{};
-            unsigned int mode{};
+            int mode{};
             glm::vec3 parameter{}; // for different shape
         };
 

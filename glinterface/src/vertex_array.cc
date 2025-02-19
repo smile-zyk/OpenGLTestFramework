@@ -1,4 +1,5 @@
 #include "vertex_array.h"
+#include "glcommon.h"
 
 glinterface::VertexArray::VertexArray()
 {
@@ -39,7 +40,20 @@ void glinterface::VertexArray::bind_attrib(GLuint attribindex, GLuint bindingind
 
 void glinterface::VertexArray::set_attrib(GLuint attribindex, GLint size, GLenum type, GLboolean normalized, GLuint relativeoffset)
 {
-	GLCall(glVertexArrayAttribFormat(id, attribindex, size, type, normalized, relativeoffset));
+	if (type == GL_INT || type == GL_UNSIGNED_INT ||
+		type == GL_SHORT || type == GL_UNSIGNED_SHORT ||
+		type == GL_BYTE || type == GL_UNSIGNED_BYTE)
+	{
+		GLCall(glVertexArrayAttribIFormat(id, attribindex, size, type, relativeoffset));
+	}
+	else if (type == GL_DOUBLE)
+	{
+		GLCall(glVertexArrayAttribLFormat(id, attribindex, size, type, relativeoffset));
+	}
+	else
+	{
+		GLCall(glVertexArrayAttribFormat(id, attribindex, size, type, normalized, relativeoffset));
+	}
 }
 
 void glinterface::VertexArray::bind() const

@@ -13,9 +13,7 @@ namespace glinterface
 		void enable(GLenum cap);
 		void disable(GLenum cap);
 		void draw_arrays(GLenum mode, GLint count);
-		void draw_arrays(GLenum mode, const VertexArray& vao, const ShaderProgram& program);
-		void draw_elements(GLenum mode, GLenum type, const VertexArray& vao, const ShaderProgram& program);
-
+		void draw_elements(GLenum mode, GLsizei count, GLenum type, const void *indices);
 		void set_polygon_mode(GLenum face, GLenum mode);
 	};
 }

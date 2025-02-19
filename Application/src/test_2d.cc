@@ -3,7 +3,6 @@
 #include "boundingbox.h"
 #include "shape.h"
 #include "test_base.h"
-#include <algorithm>
 #include <cstddef>
 #include <glm/fwd.hpp>
 #include <imgui.h>
@@ -13,8 +12,8 @@
 using namespace glinterface;
 
 const int kLayer = 100;
-const int kRectangleNumber = 1;
-const int kCircleNumber = 0;
+const int kRectangleNumber = 100;
+const int kCircleNumber = 100;
 const int kVertexNumber = kRectangleNumber * 4 + kCircleNumber * 3;
 const int kIndexNumber = kRectangleNumber * 6 + kCircleNumber * 3;
 
@@ -64,6 +63,7 @@ namespace Test
         gl_interface_.enable(GL_DEPTH_TEST);
         gl_interface_.enable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        camera_.SetNearFar( -2 * kLayer, 2 * kLayer);
         CreateShapes();
         DrawShapes();
     }
@@ -235,7 +235,7 @@ namespace Test
         static GLuint rect_indices[6] = { 0, 1, 2, 0, 2, 3};
         std::vector<GLuint> indices;
         indices.resize(6);
-        for(int i = 0; i < 6; i++) indices[i] = current_shape_index_size + rect_indices[i];
+        for(int i = 0; i < 6; i++) indices[i] = current_shape_vertex_size + rect_indices[i];
 
         memcpy(&shape_vertex_buffer_map_[current_shape_vertex_size], vertices.data(), 4 * sizeof(Vertex));
         memcpy(&shape_index_buffer_map_[current_shape_index_size], indices.data(), 6 * sizeof(GLuint));
@@ -246,7 +246,49 @@ namespace Test
     
     void Test2D::Draw(Circle* circle)
     {
-        
+        std::vector<Vertex> vertices;
+        vertices.reserve(3);
+
+        glm::vec2 center = circle->center();
+        glm::vec4 color = circle->color();
+        float radius = circle->radius();
+        float layer = circle->layer();
+        glm::vec3 pos{center, layer};
+
+        Vertex v1;
+        v1.position = pos;
+        v1.color = color;
+        v1.mode = kCircle;
+        v1.parameter.x = 1.0f;
+        v1.parameter.y = radius;
+
+        Vertex v2;
+        v2.position = pos;
+        v2.color = color;
+        v2.mode = kCircle;
+        v2.parameter.x = 2.0f;
+        v2.parameter.y = radius;
+
+        Vertex v3;
+        v3.position = pos;
+        v3.color = color;
+        v3.mode = kCircle;
+        v3.parameter.x = 3.0f;
+        v3.parameter.y = radius;
+
+        vertices.emplace_back(v1);
+        vertices.emplace_back(v2);
+        vertices.emplace_back(v3);
+
+        std::vector<GLuint> indices;
+        indices.resize(3);
+        for(int i = 0; i < 3; i++) indices[i] = current_shape_vertex_size + i;
+
+        memcpy(&shape_vertex_buffer_map_[current_shape_vertex_size], vertices.data(), 3 * sizeof(Vertex));
+        memcpy(&shape_index_buffer_map_[current_shape_index_size], indices.data(), 3 * sizeof(GLuint));
+    
+        current_shape_vertex_size += 3;
+        current_shape_index_size += 3;
     }
     
     void Test2D::DrawShapes()
@@ -260,7 +302,6 @@ namespace Test
         grid_shader_.use();
         grid_shader_.set_uniform_value("view_matrix", camera_.view_matrix());
         grid_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
-        grid_shader_.set_uniform_value("far", camera_.far());
         grid_shader_.set_uniform_value("draw_x_axis", grid_shader_parameter_.draw_x_axis);
         grid_shader_.set_uniform_value("draw_y_axis", grid_shader_parameter_.draw_y_axis);
         grid_shader_.set_uniform_value("axes_width", grid_shader_parameter_.axes_width);
@@ -275,7 +316,6 @@ namespace Test
             rect_shader_.use();
             rect_shader_.set_uniform_value("view_matrix", camera_.view_matrix());
             rect_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
-            rect_shader_.set_uniform_value("near", camera_.near());
             rect_shader_.set_uniform_value("rect_min", select_area.GetMin());
             rect_shader_.set_uniform_value("rect_max", select_area.GetMax());
             rect_shader_.set_uniform_value("mode", rect_shader_parameter_.mode);
@@ -291,10 +331,11 @@ namespace Test
     
     void Test2D::RenderShapes()
     {
+        shape_vertex_array_.bind();
         shape_shader_.use();
         shape_shader_.set_uniform_value("view_matrix", camera_.view_matrix());
         shape_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
-        gl_interface_.draw_elements(GL_TRIANGLES, GL_UNSIGNED_INT, shape_vertex_array_, shape_shader_);
+        gl_interface_.draw_elements(GL_TRIANGLES, current_shape_index_size, GL_UNSIGNED_INT, nullptr);
     }
     
     void Test2D::CreateShapes()
@@ -302,5 +343,11 @@ namespace Test
         auto rect = std::make_unique<Rectangle>(glm::vec2{-100, -100}, glm::vec2{200, 200}, 0.f);
         rect->set_color(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
         shape_list_.push_back(std::move(rect));
+        rect = std::make_unique<Rectangle>(glm::vec2{-50, -50}, glm::vec2{200, 200}, 20.f);
+        rect->set_color(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
+        shape_list_.push_back(std::move(rect));
+        auto circle = std::make_unique<Circle>(glm::vec2{-50, -50}, 100, 10.f);
+        circle->set_color(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+        shape_list_.push_back(std::move(circle));
     }
 }

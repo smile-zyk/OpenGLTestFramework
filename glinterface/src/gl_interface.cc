@@ -28,33 +28,9 @@ void GLInterface::draw_arrays(GLenum mode, GLint count)
 	GLCall(glDrawArrays(mode, 0, count));
 }
 
-void GLInterface::draw_arrays(GLenum mode, const VertexArray& vao, const ShaderProgram& program)
+void GLInterface::draw_elements(GLenum mode, GLsizei count, GLenum type, const void *indices)
 {
-	vao.bind();
-	program.use();
-	GLCall(glDrawArrays(mode, 0, vao.get_vertex_count()));
-}
-
-void GLInterface::draw_elements(GLenum mode, GLenum type, const VertexArray& vao, const ShaderProgram& program)
-{
-	vao.bind();
-	program.use();
-	GLsizei count = 0;
-	switch (type)
-	{
-	case GL_UNSIGNED_BYTE:
-		count = vao.get_element_size() / sizeof(unsigned char);
-		break;
-	case GL_UNSIGNED_SHORT:
-		count = vao.get_element_size() / sizeof(unsigned short);
-		break;
-	case GL_UNSIGNED_INT:
-		count = vao.get_element_size() / sizeof(unsigned int);
-		break;
-	default:
-		break;
-	}
-	GLCall(glDrawElements(mode, count, type, 0));
+	GLCall(glDrawElements(mode, count, type, indices));
 }
 
 void GLInterface::set_polygon_mode(GLenum face, GLenum mode)

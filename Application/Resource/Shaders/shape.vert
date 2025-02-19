@@ -27,14 +27,14 @@ vec2 get_circle_triangle_position()
     vec2 tri_offset;
     float tri_idx = parameter.x;
     float tri_radius = parameter.y;
-    float tri_edge_length = sqrt(3);
+    float half_tri_edge = sqrt(3) * tri_radius;
     if(tri_idx == 1.0)
     {
-        tri_offset = vec2(-tri_edge_length / 2.f, -tri_radius);
+        tri_offset = vec2(-half_tri_edge, -tri_radius);
     }
     else if(tri_idx == 2.0)
     {
-        tri_offset = vec2(tri_edge_length / 2.f, -tri_radius);
+        tri_offset = vec2(half_tri_edge, -tri_radius);
     }
     else if(tri_idx == 3.0)
     {

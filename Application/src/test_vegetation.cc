@@ -78,6 +78,7 @@ void Test::TestVegetation::OnRender()
 	{
 		std::cout << err << std::endl;
 	}
+	plane_vertex_array.bind();
 	plane_texture.bind(0);
 	plane_program.use();
 	plane_program.set_uniform_value("modelMatrix", glm::mat4(1.f));
@@ -85,8 +86,9 @@ void Test::TestVegetation::OnRender()
 	plane_program.set_uniform_value("projectionMatrix", camera.projection_matrix());
 	plane_program.set_uniform_value("texture0", 0);
 	plane_vertex_array.bind();
-	gl_interface_.draw_arrays(GL_TRIANGLES, plane_vertex_array, plane_program);
+	gl_interface_.draw_arrays(GL_TRIANGLES, plane_vertex_array.get_vertex_count());
 
+	grass_vertex_array.bind();
 	grass_program.use();
 	grass_program.set_uniform_value("layer", layer);
 	grass_program.set_uniform_value("topColor", topColor);
@@ -105,8 +107,7 @@ void Test::TestVegetation::OnRender()
 	float innerLev[] = { intensity, intensity };
 	grass_program.set_patch_para(GL_PATCH_DEFAULT_OUTER_LEVEL, outerLev);
 	grass_program.set_patch_para(GL_PATCH_DEFAULT_INNER_LEVEL, innerLev);
-
-	gl_interface_.draw_arrays(GL_PATCHES, grass_vertex_array, grass_program);
+	gl_interface_.draw_arrays(GL_PATCHES, grass_vertex_array.get_vertex_count());
 }
 
 void Test::TestVegetation::OnImGuiRender()

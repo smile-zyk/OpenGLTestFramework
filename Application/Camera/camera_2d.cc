@@ -45,7 +45,7 @@ void Camera2D::UpdateViewMatrix()
 
 void Camera2D::UpdateProjectionMatrix()
 {
-    projection_matrix_ = glm::ortho(-width_ / (2.f * zoom_) , width_ / (2.f * zoom_) , -height_ / (2.f * zoom_), height_ / (2.f * zoom_), near_/ zoom_, far_ / zoom_);
+    projection_matrix_ = glm::ortho(-width_ / (2.f * zoom_) , width_ / (2.f * zoom_) , -height_ / (2.f * zoom_), height_ / (2.f * zoom_), near_, far_);
 }
 
 void Camera2D::set_center(glm::vec2 center)
