@@ -3,6 +3,7 @@
 #include "boundingbox.h"
 #include "shape.h"
 #include "test_base.h"
+#include <cmath>
 #include <cstddef>
 #include <glm/fwd.hpp>
 #include <imgui.h>
@@ -11,11 +12,9 @@
 
 using namespace glinterface;
 
-const int kLayer = 100;
-const int kRectangleNumber = 100;
-const int kCircleNumber = 100;
-const int kVertexNumber = kRectangleNumber * 4 + kCircleNumber * 3;
-const int kIndexNumber = kRectangleNumber * 6 + kCircleNumber * 3;
+const int kLayer = 10000;
+const int kVertexNumber = kLayer * 4 + kLayer * 3;
+const int kIndexNumber = kLayer * 6 + kLayer * 3;
 
 namespace Test
 {
@@ -338,16 +337,40 @@ namespace Test
         gl_interface_.draw_elements(GL_TRIANGLES, current_shape_index_size, GL_UNSIGNED_INT, nullptr);
     }
     
+    float GenerateRandomValue(float min, float max)
+    {
+        float range = fabs(max - min);
+        return static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX) * range + min;
+    }
+
+    glm::vec4 GenerateRandomColor()
+    {
+        // 生成随机的红绿蓝值（范围：0.0 到 1.0）
+        float r = GenerateRandomValue(0.f, 1.f);
+        float g = GenerateRandomValue(0.f, 1.f);
+        float b = GenerateRandomValue(0.f, 1.f);
+        float a = 1.0f;
+        return {r, g, b, a};
+    }
+
+    glm::vec2 GenerateRandomPosition(float min, float max)
+    {
+        float x = GenerateRandomValue(min, max);
+        float y = GenerateRandomValue(min, max);
+        return {x, y};
+    }
+
     void Test2D::CreateShapes()
     {
-        auto rect = std::make_unique<Rectangle>(glm::vec2{-100, -100}, glm::vec2{200, 200}, 0.f);
-        rect->set_color(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-        shape_list_.push_back(std::move(rect));
-        rect = std::make_unique<Rectangle>(glm::vec2{-50, -50}, glm::vec2{200, 200}, 20.f);
-        rect->set_color(glm::vec4(1.0f, 1.0f, 0.0f, 1.0f));
-        shape_list_.push_back(std::move(rect));
-        auto circle = std::make_unique<Circle>(glm::vec2{-50, -50}, 100, 10.f);
-        circle->set_color(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-        shape_list_.push_back(std::move(circle));
+        std::srand(static_cast<unsigned int>(std::time(0))); 
+        for(int i = 0; i < kLayer; i++)
+        {
+            auto rect = std::make_unique<Rectangle>(GenerateRandomPosition(- 3 * kLayer, 3 * kLayer), GenerateRandomPosition(kLayer / 5.f, kLayer / 3.f), i);
+            rect->set_color(GenerateRandomColor());
+            shape_list_.push_back(std::move(rect));
+            auto circle = std::make_unique<Circle>(GenerateRandomPosition(-3 * kLayer, 3 * kLayer), GenerateRandomValue(kLayer / 10.f, kLayer / 6.f), i + 0.5);
+            circle->set_color(GenerateRandomColor());
+            shape_list_.push_back(std::move(circle));
+        }
     }
 }
