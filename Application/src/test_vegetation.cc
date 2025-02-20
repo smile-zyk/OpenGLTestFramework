@@ -19,13 +19,13 @@ Test::TestVegetation::TestVegetation()
 	: plane_texture(GL_TEXTURE_2D, "..\\..\\Application\\Resource\\Textures\\metal.png"),
 	camera(60, 0.1f, 50, static_cast<float>(screen_width) / screen_height)
 {
-	plane_program.attach_shader(std::make_shared<Shader>(GL_VERTEX_SHADER, "..\\..\\Application\\Resource\\Shaders\\plane.vert"));
-	plane_program.attach_shader(std::make_shared<Shader>(GL_FRAGMENT_SHADER, "..\\..\\Application\\Resource\\Shaders\\plane.frag"));
+	plane_program.attach_shader(std::make_shared<Shader>(GL_VERTEX_SHADER, "shaders/plane.vert"));
+	plane_program.attach_shader(std::make_shared<Shader>(GL_FRAGMENT_SHADER, "shaders/plane.frag"));
 	plane_program.link();
-	grass_program.attach_shader(std::make_shared<Shader>(GL_VERTEX_SHADER, "..\\..\\Application\\Resource\\Shaders\\grass.vert"));
-	grass_program.attach_shader(std::make_shared<Shader>(GL_FRAGMENT_SHADER, "..\\..\\Application\\Resource\\Shaders\\grass.frag"));
-	grass_program.attach_shader(std::make_shared<Shader>(GL_GEOMETRY_SHADER, "..\\..\\Application\\Resource\\Shaders\\grass.geom"));
-	grass_program.attach_shader(std::make_shared<Shader>(GL_TESS_EVALUATION_SHADER, "..\\..\\Application\\Resource\\Shaders\\grass.tese"));
+	grass_program.attach_shader(std::make_shared<Shader>(GL_VERTEX_SHADER, "shaders/grass.vert"));
+	grass_program.attach_shader(std::make_shared<Shader>(GL_FRAGMENT_SHADER, "shaders/grass.frag"));
+	grass_program.attach_shader(std::make_shared<Shader>(GL_GEOMETRY_SHADER, "shaders/grass.geom"));
+	grass_program.attach_shader(std::make_shared<Shader>(GL_TESS_EVALUATION_SHADER, "shaders/grass.tese"));
 	grass_program.link();
 
 	grass_vertices = create_grass_vertices();

@@ -18,6 +18,7 @@
           "glfw-binding"
         ]
       },
-      "stduuid"
+      "stduuid",
+      "bshoshany-thread-pool"
     ]
 }

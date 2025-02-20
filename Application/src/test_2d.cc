@@ -3,34 +3,48 @@
 #include "boundingbox.h"
 #include "shape.h"
 #include "test_base.h"
+#include "thread_pool.h"
+#include "prof_timer.h"
+
+#include <cstring>
+#include <future>
+#include <imgui.h>
+
+#include <iostream>
+#include <iterator>
+#include <map>
+#include <memory>
+#include <utility>
+#include <vector>
 #include <cmath>
 #include <cstddef>
-#include <glm/fwd.hpp>
-#include <imgui.h>
-#include <memory>
-#include <vector>
 
 using namespace glinterface;
 
-const int kLayer = 10000;
-const int kVertexNumber = kLayer * 4 + kLayer * 3;
-const int kIndexNumber = kLayer * 6 + kLayer * 3;
+bool EnableThreadPoolCreate = true;
+int Layer = 2;
+const int kMaxLayer = 10000;
+const int kLayerRectangle = 5;
+const int kLayerCircle = 5;
+const int kVertexNumber = kMaxLayer * kLayerRectangle * 4 + kMaxLayer * kLayerCircle * 3;
+const int kIndexNumber = kMaxLayer * kLayerRectangle * 6 + kMaxLayer * kLayerCircle * 3;
 
 namespace Test
 {
     Test2D::Test2D(): camera_(screen_width, screen_height, -1.f, 1.f)
     {
         // init shaders
-        grid_shader_.attach_shader(std::make_shared<Shader>(GL_VERTEX_SHADER, "..\\..\\Application\\Resource\\Shaders\\grid.vert"));
-        grid_shader_.attach_shader(std::make_shared<Shader>(GL_FRAGMENT_SHADER, "..\\..\\Application\\Resource\\Shaders\\grid.frag"));
+        grid_shader_.attach_shader(std::make_shared<Shader>(GL_VERTEX_SHADER, "shaders/grid.vert"));
+        grid_shader_.attach_shader(std::make_shared<Shader>(GL_FRAGMENT_SHADER, "shaders/grid.frag"));
         grid_shader_.link();
-        rect_shader_.attach_shader(std::make_shared<Shader>(GL_VERTEX_SHADER, "..\\..\\Application\\Resource\\Shaders\\rect.vert"));
-        rect_shader_.attach_shader(std::make_shared<Shader>(GL_FRAGMENT_SHADER, "..\\..\\Application\\Resource\\Shaders\\rect.frag"));        
+        rect_shader_.attach_shader(std::make_shared<Shader>(GL_VERTEX_SHADER, "shaders/rect.vert"));
+        rect_shader_.attach_shader(std::make_shared<Shader>(GL_FRAGMENT_SHADER, "shaders/rect.frag"));        
         rect_shader_.link();
-        shape_shader_.attach_shader(std::make_shared<Shader>(GL_VERTEX_SHADER, "..\\..\\Application\\Resource\\Shaders\\shape.vert"));
-        shape_shader_.attach_shader(std::make_shared<Shader>(GL_FRAGMENT_SHADER, "..\\..\\Application\\Resource\\Shaders\\shape.frag"));        
+        shape_shader_.attach_shader(std::make_shared<Shader>(GL_VERTEX_SHADER, "shaders/shape.vert"));
+        shape_shader_.attach_shader(std::make_shared<Shader>(GL_FRAGMENT_SHADER, "shaders/shape.frag"));        
         shape_shader_.link();
 
+        // init buffer & vertex array
         GLbitfield map_flags = GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_WRITE_BIT;
         shape_vertex_buffer_.allocate_storage(kVertexNumber * sizeof(Vertex), nullptr, map_flags);
         shape_index_buffer_.allocate_storage(kIndexNumber * sizeof(GLuint), nullptr, map_flags);
@@ -58,12 +72,17 @@ namespace Test
         shape_vertex_array_.enable_attrib(2);
         shape_vertex_array_.enable_attrib(3);
         
+        // init gl state
         gl_interface_.set_clear_color(0.2f, 0.2f, 0.2f, 1.0f);
         gl_interface_.enable(GL_DEPTH_TEST);
         gl_interface_.enable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        camera_.SetNearFar( -2 * kLayer, 2 * kLayer);
-        CreateShapes();
+        
+        // set camera near and far
+        camera_.SetNearFar( -2 * Layer, 2 * Layer);
+        
+        // create shapes and push to shape_list_
+        CreateRandomShapes();
         DrawShapes();
     }
     
@@ -95,6 +114,17 @@ namespace Test
         glm::vec2 viewport_min = viewport.GetMin();
         glm::vec2 viewport_max = viewport.GetMax();
         ImGui::Text("Viewport is (%.2f, %.2f), (%.2f, %.2f)", viewport_min.x, viewport_min.y, viewport_max.x, viewport_max.y);
+        ImGui::Text("Layer:");
+        ImGui::SameLine();
+        if(ImGui::InputInt("##hiddenLabel", &Layer))
+        {
+            if(Layer > kMaxLayer) Layer = kMaxLayer;
+            if(Layer < 1)  Layer = 1;
+            camera_.SetNearFar( -2 * Layer, 2 * Layer);
+            ClearShapes();
+            CreateRandomShapes();
+            DrawShapes();
+        }
         ImGui::BeginGroup();
         ImGui::Text("Grid");
         ImGui::Separator();
@@ -296,6 +326,15 @@ namespace Test
             Draw(shape_list_[i].get());
     }
     
+    void Test2D::ClearShapes()
+    {
+        shape_list_.clear();
+        memset(shape_vertex_buffer_map_, 0, kVertexNumber * sizeof(Vertex));
+        memset(shape_index_buffer_map_, 0, kIndexNumber * sizeof(GLuint));
+        current_shape_index_size = 0;
+        current_shape_vertex_size = 0;
+    }
+    
     void Test2D::RenderScene()
     {
         grid_shader_.use();
@@ -345,7 +384,6 @@ namespace Test
 
     glm::vec4 GenerateRandomColor()
     {
-        // 生成随机的红绿蓝值（范围：0.0 到 1.0）
         float r = GenerateRandomValue(0.f, 1.f);
         float g = GenerateRandomValue(0.f, 1.f);
         float b = GenerateRandomValue(0.f, 1.f);
@@ -360,17 +398,85 @@ namespace Test
         return {x, y};
     }
 
-    void Test2D::CreateShapes()
+    void Test2D::CreateRandomShapes()
     {
         std::srand(static_cast<unsigned int>(std::time(0))); 
-        for(int i = 0; i < kLayer; i++)
+        ProfTimer timer("CreateRandomShapes Time");
+        if(EnableThreadPoolCreate)
         {
-            auto rect = std::make_unique<Rectangle>(GenerateRandomPosition(- 3 * kLayer, 3 * kLayer), GenerateRandomPosition(kLayer / 5.f, kLayer / 3.f), i);
-            rect->set_color(GenerateRandomColor());
-            shape_list_.push_back(std::move(rect));
-            auto circle = std::make_unique<Circle>(GenerateRandomPosition(-3 * kLayer, 3 * kLayer), GenerateRandomValue(kLayer / 10.f, kLayer / 6.f), i + 0.5);
-            circle->set_color(GenerateRandomColor());
-            shape_list_.push_back(std::move(circle));
+            ThreadPool& thread_pool = GetThreadPool();
+            int thread_number = thread_pool.get_thread_count();
+            if(thread_number > Layer) thread_number = Layer;
+
+            int layer_per_thread = Layer / thread_number;
+            int remaining_layer = Layer % thread_number;
+
+            std::vector<std::future<std::pair<int, std::vector<std::unique_ptr<Shape>>>>> future_list;
+
+            int start = 0;
+            int end = start;
+            for(int i = 0; i < thread_number; i++)
+            {
+                end = start + layer_per_thread + (i < remaining_layer ? 1 : 0);
+                future_list.push_back(thread_pool.submit_task([&, idx = i, start , end]
+                {
+                    std::vector<std::unique_ptr<Shape>> shape_list;
+                    for(int i = start; i < end; i++)
+                    {
+                        float current_layer = i;
+                        float layer_step = 1.0f / (kLayerRectangle + kLayerCircle);
+                        for(int j = 0; j < kLayerRectangle; j++)
+                        {
+                            auto rect = std::make_unique<Rectangle>(GenerateRandomPosition(-5 * Layer, 5 * Layer), GenerateRandomPosition(Layer / 4.f, Layer / 2.f), current_layer);
+                            rect->set_color(GenerateRandomColor());
+                            current_layer += layer_step;
+                            shape_list.push_back(std::move(rect));
+                        }
+                        for(int j = 0; j < kLayerCircle; j++)
+                        {
+                            auto circle = std::make_unique<Circle>(GenerateRandomPosition(-5 * Layer, 5 * Layer), GenerateRandomValue(Layer / 8.f, Layer / 4.f), current_layer);
+                            circle->set_color(GenerateRandomColor());
+                            current_layer += layer_step;
+                            shape_list.push_back(std::move(circle));
+                        }
+                    }
+                    std::pair<int, std::vector<std::unique_ptr<Shape>>> res(idx, std::move(shape_list));
+                    return res;
+                }));
+                start = end;
+            }
+            std::map<int, std::vector<std::unique_ptr<Shape>>> shape_map;
+            for(auto& fu: future_list)
+            {
+                shape_map.insert(fu.get());
+            }
+            for(auto& [key, value] : shape_map)
+            {
+                shape_list_.insert(shape_list_.end(), std::make_move_iterator(value.begin()), std::make_move_iterator(value.end()));
+            }
         }
+        else 
+        {
+            for(int i = 0; i < Layer; i++)
+            {
+                float current_layer = i;
+                float layer_step = 1.0f / (kLayerRectangle + kLayerCircle);
+                for(int j = 0; j < kLayerRectangle; j++)
+                {
+                    auto rect = std::make_unique<Rectangle>(GenerateRandomPosition(-5 * Layer, 5 * Layer), GenerateRandomPosition(Layer / 4.f, Layer / 2.f), current_layer);
+                    rect->set_color(GenerateRandomColor());
+                    shape_list_.push_back(std::move(rect));
+                    current_layer += layer_step;
+                }
+                for(int j = 0; j < kLayerCircle; j++)
+                {
+                    auto circle = std::make_unique<Circle>(GenerateRandomPosition(-5 * Layer, 5 * Layer), GenerateRandomValue(Layer / 8.f, Layer / 4.f), current_layer);
+                    circle->set_color(GenerateRandomColor());
+                    shape_list_.push_back(std::move(circle));
+                    current_layer += layer_step;
+                }
+            }
+        }
+        std::cout << "Create time is: " << timer.SinceStartSecs() << std::endl;
     }
 }

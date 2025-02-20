@@ -77,13 +77,15 @@ namespace Test
 
         void DrawShapes();
 
+        void ClearShapes();
+
         void RenderScene();
 
         void RenderSelectArea(const BoundingBox& select_area);
 
         void RenderShapes();
 
-        void CreateShapes();
+        void CreateRandomShapes();
 
         void* rect_vertex_buffer_map_;
         bool mouse_left_pressed_ = false;

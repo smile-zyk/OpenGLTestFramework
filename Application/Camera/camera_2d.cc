@@ -20,7 +20,7 @@ void Camera2D::Move(glm::vec2 motion)
 
 void Camera2D::Zoom(float ratio)
 {
-    zoom_ *= (float)std::pow(0.95, -ratio);
+    zoom_ *= (float)std::pow(0.99, -ratio);
     UpdateProjectionMatrix();
 }
 
