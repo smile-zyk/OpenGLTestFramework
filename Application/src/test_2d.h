@@ -9,10 +9,13 @@
 #include "camera_2d.h"
 #include "boundingbox.h"
 #include "vertex_array.h"
+#include "shape_rtree.h"
 
+#include <uuid.h>
+
+#include <map>
 #include <memory>
 #include <vector>
-#include <uuid.h>
 
 namespace Test
 {
@@ -87,13 +90,17 @@ namespace Test
 
         void CreateRandomShapes();
 
+        void DrawShapeCallback(Shape*);
+
         void* rect_vertex_buffer_map_;
         bool mouse_left_pressed_ = false;
 		bool mouse_right_pressed_ = false;
 		bool first_pressed = true;
 		glm::vec2 origin_pressed_pos_ = { 0.f,0.f };
         std::vector<std::unique_ptr<Shape>> shape_list_;
-        
+        std::map<uuids::uuid, RenderItem> shape_render_item_map_;
+        ShapeRTree shape_rtree;
+
         BoundingBox select_area_;
         GridShaderParameter grid_shader_parameter_;
         RectShaderParameter rect_shader_parameter_;

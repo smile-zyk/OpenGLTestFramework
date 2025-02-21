@@ -16,16 +16,14 @@
 #include <memory>
 #include <utility>
 #include <vector>
-#include <cmath>
-#include <cstddef>
 
 using namespace glinterface;
 
 bool EnableThreadPoolCreate = true;
-int Layer = 2;
-const int kMaxLayer = 10000;
-const int kLayerRectangle = 5;
-const int kLayerCircle = 5;
+int Layer = 1000;
+const int kMaxLayer = 100000;
+const int kLayerRectangle = 10;
+const int kLayerCircle = 10;
 const int kVertexNumber = kMaxLayer * kLayerRectangle * 4 + kMaxLayer * kLayerCircle * 3;
 const int kIndexNumber = kMaxLayer * kLayerRectangle * 6 + kMaxLayer * kLayerCircle * 3;
 
@@ -79,7 +77,7 @@ namespace Test
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
         // set camera near and far
-        camera_.SetNearFar( -2 * Layer, 2 * Layer);
+        camera_.SetNearFar( -2.f * Layer, 2.f * Layer);
         
         // create shapes and push to shape_list_
         CreateRandomShapes();
@@ -120,7 +118,7 @@ namespace Test
         {
             if(Layer > kMaxLayer) Layer = kMaxLayer;
             if(Layer < 1)  Layer = 1;
-            camera_.SetNearFar( -2 * Layer, 2 * Layer);
+            camera_.SetNearFar( -2.f * Layer, 2.f * Layer);
             ClearShapes();
             CreateRandomShapes();
             DrawShapes();
@@ -378,8 +376,11 @@ namespace Test
     
     float GenerateRandomValue(float min, float max)
     {
-        float range = fabs(max - min);
-        return static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX) * range + min;
+        thread_local std::mt19937 generator(std::random_device{}());
+    
+        std::uniform_real_distribution<float> distribution(min, max);
+
+        return distribution(generator);
     }
 
     glm::vec4 GenerateRandomColor()
@@ -398,9 +399,22 @@ namespace Test
         return {x, y};
     }
 
+    std::unique_ptr<Rectangle> MakeRandomRectangle(float layer)
+    {
+        auto rect = std::make_unique<Rectangle>(GenerateRandomPosition(-10.f * Layer, 10.f * Layer), GenerateRandomPosition(Layer / 4.f, Layer / 2.f), layer);
+        rect->set_color(GenerateRandomColor());
+        return rect;
+    }
+
+    std::unique_ptr<Circle> MakeRandomCircle(float layer)
+    {
+        auto circle = std::make_unique<Circle>(GenerateRandomPosition(-10.f * Layer, 10.f * Layer), GenerateRandomValue(Layer / 8.f, Layer / 4.f), layer);
+        circle->set_color(GenerateRandomColor());
+        return circle;
+    }
+
     void Test2D::CreateRandomShapes()
     {
-        std::srand(static_cast<unsigned int>(std::time(0))); 
         ProfTimer timer("CreateRandomShapes Time");
         if(EnableThreadPoolCreate)
         {
@@ -423,19 +437,17 @@ namespace Test
                     std::vector<std::unique_ptr<Shape>> shape_list;
                     for(int i = start; i < end; i++)
                     {
-                        float current_layer = i;
+                        float current_layer = static_cast<float>(i);
                         float layer_step = 1.0f / (kLayerRectangle + kLayerCircle);
                         for(int j = 0; j < kLayerRectangle; j++)
                         {
-                            auto rect = std::make_unique<Rectangle>(GenerateRandomPosition(-5 * Layer, 5 * Layer), GenerateRandomPosition(Layer / 4.f, Layer / 2.f), current_layer);
-                            rect->set_color(GenerateRandomColor());
+                            auto rect = MakeRandomRectangle(current_layer);
                             current_layer += layer_step;
                             shape_list.push_back(std::move(rect));
                         }
                         for(int j = 0; j < kLayerCircle; j++)
                         {
-                            auto circle = std::make_unique<Circle>(GenerateRandomPosition(-5 * Layer, 5 * Layer), GenerateRandomValue(Layer / 8.f, Layer / 4.f), current_layer);
-                            circle->set_color(GenerateRandomColor());
+                            auto circle = MakeRandomCircle(current_layer);
                             current_layer += layer_step;
                             shape_list.push_back(std::move(circle));
                         }
@@ -459,21 +471,19 @@ namespace Test
         {
             for(int i = 0; i < Layer; i++)
             {
-                float current_layer = i;
+                float current_layer = static_cast<float>(i);
                 float layer_step = 1.0f / (kLayerRectangle + kLayerCircle);
                 for(int j = 0; j < kLayerRectangle; j++)
                 {
-                    auto rect = std::make_unique<Rectangle>(GenerateRandomPosition(-5 * Layer, 5 * Layer), GenerateRandomPosition(Layer / 4.f, Layer / 2.f), current_layer);
-                    rect->set_color(GenerateRandomColor());
-                    shape_list_.push_back(std::move(rect));
+                    auto rect = MakeRandomRectangle(current_layer);
                     current_layer += layer_step;
+                    shape_list_.push_back(std::move(rect));
                 }
                 for(int j = 0; j < kLayerCircle; j++)
                 {
-                    auto circle = std::make_unique<Circle>(GenerateRandomPosition(-5 * Layer, 5 * Layer), GenerateRandomValue(Layer / 8.f, Layer / 4.f), current_layer);
-                    circle->set_color(GenerateRandomColor());
-                    shape_list_.push_back(std::move(circle));
+                    auto circle = MakeRandomCircle(current_layer);
                     current_layer += layer_step;
+                    shape_list_.push_back(std::move(circle));
                 }
             }
         }

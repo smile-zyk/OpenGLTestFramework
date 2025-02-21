@@ -20,7 +20,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
 target_link_libraries(${PROJECT_NAME} PRIVATE imgui::imgui)
 target_link_libraries(${PROJECT_NAME} PRIVATE freetype-gl)
 target_link_libraries(${PROJECT_NAME} PRIVATE stduuid)
-
+target_link_libraries(${PROJECT_NAME} PRIVATE RTree)
 
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
