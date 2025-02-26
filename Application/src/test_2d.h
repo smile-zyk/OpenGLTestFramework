@@ -9,7 +9,7 @@
 #include "camera_2d.h"
 #include "boundingbox.h"
 #include "vertex_array.h"
-#include "shape_rtree.h"
+#include "shape_layer.h"
 
 #include <uuid.h>
 
@@ -72,6 +72,15 @@ namespace Test
             glm::vec4 filled_color{0.6f, 0.6f, 0.6f, 0.5f};
         };
 
+        // for multithread
+        struct MakeLayerReturn
+        {
+            std::vector<std::unique_ptr<Shape>> shape_list;
+            std::unique_ptr<ShapeLayer> shape_layer; 
+        };
+
+        MakeLayerReturn MakeRandomLayer(int layer_id);
+
         void Draw(Shape* shape);
 
         void Draw(Rectangle* rect) override;
@@ -92,6 +101,8 @@ namespace Test
 
         void DrawShapeCallback(Shape*);
 
+        void SortShapeLayer();
+
         void* rect_vertex_buffer_map_;
         bool mouse_left_pressed_ = false;
 		bool mouse_right_pressed_ = false;
@@ -99,7 +110,7 @@ namespace Test
 		glm::vec2 origin_pressed_pos_ = { 0.f,0.f };
         std::vector<std::unique_ptr<Shape>> shape_list_;
         std::map<uuids::uuid, RenderItem> shape_render_item_map_;
-        ShapeRTree shape_rtree;
+        std::vector<std::unique_ptr<ShapeLayer>> shape_layer_list_;
 
         BoundingBox select_area_;
         GridShaderParameter grid_shader_parameter_;

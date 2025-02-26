@@ -2,7 +2,7 @@
     "version": 5,
     "configurePresets": [
         {
-            "name": "Config-Base",
+            "name": "base",
             "hidden": true,
             "generator": "Ninja Multi-Config",
             "cacheVariables": {
@@ -12,116 +12,116 @@
                     "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
                     "type": "FILEPATH"
                 }
+            },
+            "binaryDir": "build"
+        },
+        {
+            "name": "msvc-config",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "cl",
+                "CMAKE_C_COMPILER": "cl",
+                "VCPKG_TARGET_TRIPLET" : "x64-windows"
+            },
+            "toolset": {
+                "value": "v143"
             }
         },
         {
-            "name": "Windows-Mingw-Config",
-            "inherits": "Config-Base",
+            "name": "mingw-config",
+            "inherits": "base",
             "cacheVariables": {
                 "CMAKE_CXX_COMPILER": "g++",
                 "CMAKE_C_COMPILER": "gcc",
-                "VCPKG_TARGET_TRIPLET" : "x64-mingw-dynamic",
-                "VCPKG_HOST_TRIPLET" : "x64-mingw-dynamic"
-            },
-            "architecture": {
-                "value": "x64"
-            },
-            "toolset": {
-                "value": "host=x64"
-            },
-            "binaryDir": "build"
-        },
-        {
-            "name": "Windows-Config-Base",
-            "inherits": "Config-Base",
-            "hidden": true,
-            "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "cl",
-                "CMAKE_C_COMPILER": "cl"
+                "VCPKG_TARGET_TRIPLET" : "x64-mingw-dynamic"
             }
-        },
-        {
-            "name": "x64-Windows-Config",
-            "inherits": "Windows-Config-Base",
-            "architecture": {
-                "value": "x64"
-            },
-            "toolset": {
-                "value": "v143,host=x64"
-            },
-            "binaryDir": "build"
-        },
-        {
-            "name": "x86-Windows-Config",
-            "inherits": "Windows-Config-Base",
-            "architecture": {
-                "value": "x86"
-            },
-            "toolset": {
-                "value": "v143,host=x64"
-            },
-            "binaryDir": "build"
         }
     ],
     "buildPresets": [
         {
-            "name": "x64-Windows-Build-Debug",
-            "configurePreset": "x64-Windows-Config",
+            "name": "msvc-debug-build",
+            "configurePreset": "msvc-config",
             "configuration": "Debug"
         },
         {
-            "name": "x64-Windows-Build-Release",
-            "configurePreset": "x64-Windows-Config",
+            "name": "msvc-release-build",
+            "configurePreset": "msvc-config",
             "configuration": "Release"
         },
         {
-            "name": "x64-Windows-Build-RelWithDebInfo",
-            "configurePreset": "x64-Windows-Config",
+            "name": "msvc-relwithdebinfo-build",
+            "configurePreset": "msvc-config",
             "configuration": "RelWithDebInfo"
         },
         {
-            "name": "x86-Windows-Build-Debug",
-            "configurePreset": "x86-Windows-Config",
+            "name": "mingw-debug-build",
+            "configurePreset": "mingw-config",
             "configuration": "Debug"
         },
         {
-            "name": "x86-Windows-Build-Release",
-            "configurePreset": "x86-Windows-Config",
+            "name": "mingw-release-build",
+            "configurePreset": "mingw-config",
             "configuration": "Release"
         },
         {
-            "name": "x86-Windows-Build-RelWithDebInfo",
-            "configurePreset": "x86-Windows-Config",
+            "name": "mingw-relwithdebinfo-build",
+            "configurePreset": "mingw-config",
             "configuration": "RelWithDebInfo"
-        },
-        {
-            "name": "x64-Windows-MinGW-Debug",
-            "configurePreset": "Windows-Mingw-Config",
-            "configuration": "Debug"
         }
     ],
     "testPresets": [
         {
-            "name": "x64-Windows-Test-Debug",
-            "configurePreset": "x64-Windows-Config",
+            "name": "msvc-debug-test",
+            "configurePreset": "msvc-config",
             "configuration": "Debug",
-            "output": 
+            "execution": 
             {
-                "verbosity":"verbose"
+                "stopOnFailure": true
             }
         },
         {
-            "name": "x64-Windows-Test-Release",
-            "configurePreset": "x64-Windows-Config",
-            "configuration": "Release"
+            "name": "msvc-release-test",
+            "configurePreset": "msvc-config",
+            "configuration": "Release",
+            "execution": 
+            {
+                "stopOnFailure": true
+            }
         },
         {
-            "name": "x64-Windows-Test-RelWithDebInfo",
-            "configurePreset": "x64-Windows-Config",
+            "name": "msvc-relwithdebinfo-test",
+            "configurePreset": "msvc-config",
             "configuration": "RelWithDebInfo",
-            "output": 
+            "execution": 
             {
-                "verbosity":"verbose"
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "mingw-debug-test",
+            "configurePreset": "mingw-config",
+            "configuration": "Debug",
+            "execution": 
+            {
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "mingw-release-test",
+            "configurePreset": "mingw-config",
+            "configuration": "Release",
+            "execution": 
+            {
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "mingw-relwithdebinfo-test",
+            "configurePreset": "mingw-config",
+            "configuration": "RelWithDebInfo",
+            "execution": 
+            {
+                "stopOnFailure": true
             }
         }
     ]

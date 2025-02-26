@@ -2,6 +2,7 @@
 #include "glcommon.h"
 #include "boundingbox.h"
 #include "shape.h"
+#include "shape_layer.h"
 #include "test_base.h"
 #include "thread_pool.h"
 #include "prof_timer.h"
@@ -20,12 +21,12 @@
 using namespace glinterface;
 
 bool EnableThreadPoolCreate = true;
-int Layer = 1000;
-const int kMaxLayer = 100000;
-const int kLayerRectangle = 10;
-const int kLayerCircle = 10;
-const int kVertexNumber = kMaxLayer * kLayerRectangle * 4 + kMaxLayer * kLayerCircle * 3;
-const int kIndexNumber = kMaxLayer * kLayerRectangle * 6 + kMaxLayer * kLayerCircle * 3;
+int Layer = 100;
+const int kMaxLayer = 10000;
+const int kRectanglePerLayer = 5;
+const int kCirclePerLayer = 5;
+const int kVertexNumber = kMaxLayer * kRectanglePerLayer * 4 + kMaxLayer * kCirclePerLayer * 3;
+const int kIndexNumber = kMaxLayer * kRectanglePerLayer * 6 + kMaxLayer * kCirclePerLayer * 3;
 
 namespace Test
 {
@@ -79,6 +80,7 @@ namespace Test
         // set camera near and far
         camera_.SetNearFar( -2.f * Layer, 2.f * Layer);
         
+        shape_layer_list_.reserve(kMaxLayer);
         // create shapes and push to shape_list_
         CreateRandomShapes();
         DrawShapes();
@@ -413,6 +415,27 @@ namespace Test
         return circle;
     }
 
+    Test2D::MakeLayerReturn Test2D::MakeRandomLayer(int layer_id)
+    {
+        Test2D::MakeLayerReturn r;
+        r.shape_layer = std::make_unique<ShapeLayer>(layer_id);
+        float current_layer = r.shape_layer->depth();
+        for(int j = 0; j < kRectanglePerLayer; j++)
+        {
+            auto rect = MakeRandomRectangle(current_layer);
+            r.shape_layer->GetRTree().Insert(rect.get());
+            r.shape_list.emplace_back(std::move(rect));
+        }
+        for(int j = 0; j < kCirclePerLayer; j++)
+        {
+            auto circle = MakeRandomCircle(current_layer);
+            r.shape_layer->GetRTree().Insert(circle.get());
+            r.shape_list.push_back(std::move(circle));
+        }
+        return r;
+    }
+    
+
     void Test2D::CreateRandomShapes()
     {
         ProfTimer timer("CreateRandomShapes Time");
@@ -425,7 +448,9 @@ namespace Test
             int layer_per_thread = Layer / thread_number;
             int remaining_layer = Layer % thread_number;
 
-            std::vector<std::future<std::pair<int, std::vector<std::unique_ptr<Shape>>>>> future_list;
+            typedef std::vector<MakeLayerReturn> MakeLayerReturnVector;
+            typedef std::future<std::pair<int, MakeLayerReturnVector>> LayerVectorFuture;
+            std::vector<LayerVectorFuture> future_list;
 
             int start = 0;
             int end = start;
@@ -434,57 +459,37 @@ namespace Test
                 end = start + layer_per_thread + (i < remaining_layer ? 1 : 0);
                 future_list.push_back(thread_pool.submit_task([&, idx = i, start , end]
                 {
-                    std::vector<std::unique_ptr<Shape>> shape_list;
+                    MakeLayerReturnVector layer_return_vector;
                     for(int i = start; i < end; i++)
                     {
-                        float current_layer = static_cast<float>(i);
-                        float layer_step = 1.0f / (kLayerRectangle + kLayerCircle);
-                        for(int j = 0; j < kLayerRectangle; j++)
-                        {
-                            auto rect = MakeRandomRectangle(current_layer);
-                            current_layer += layer_step;
-                            shape_list.push_back(std::move(rect));
-                        }
-                        for(int j = 0; j < kLayerCircle; j++)
-                        {
-                            auto circle = MakeRandomCircle(current_layer);
-                            current_layer += layer_step;
-                            shape_list.push_back(std::move(circle));
-                        }
+                        layer_return_vector.emplace_back(MakeRandomLayer(i));
                     }
-                    std::pair<int, std::vector<std::unique_ptr<Shape>>> res(idx, std::move(shape_list));
+                    std::pair<int, MakeLayerReturnVector> res(idx, std::move(layer_return_vector));
                     return res;
                 }));
                 start = end;
             }
-            std::map<int, std::vector<std::unique_ptr<Shape>>> shape_map;
+            std::map<int, MakeLayerReturnVector> layer_map;
             for(auto& fu: future_list)
             {
-                shape_map.insert(fu.get());
+                layer_map.insert(fu.get());
             }
-            for(auto& [key, value] : shape_map)
+            for(auto& [key, value] : layer_map)
             {
-                shape_list_.insert(shape_list_.end(), std::make_move_iterator(value.begin()), std::make_move_iterator(value.end()));
+                for(auto& layer: value)
+                {
+                    shape_layer_list_.emplace_back(std::move(layer.shape_layer));
+                    shape_list_.insert(shape_list_.end(), std::make_move_iterator(layer.shape_list.begin()), std::make_move_iterator(layer.shape_list.end()));
+                }
             }
         }
         else 
         {
             for(int i = 0; i < Layer; i++)
             {
-                float current_layer = static_cast<float>(i);
-                float layer_step = 1.0f / (kLayerRectangle + kLayerCircle);
-                for(int j = 0; j < kLayerRectangle; j++)
-                {
-                    auto rect = MakeRandomRectangle(current_layer);
-                    current_layer += layer_step;
-                    shape_list_.push_back(std::move(rect));
-                }
-                for(int j = 0; j < kLayerCircle; j++)
-                {
-                    auto circle = MakeRandomCircle(current_layer);
-                    current_layer += layer_step;
-                    shape_list_.push_back(std::move(circle));
-                }
+                auto layer = MakeRandomLayer(i);
+                shape_layer_list_.emplace_back(std::move(layer.shape_layer));
+                shape_list_.insert(shape_list_.end(), std::make_move_iterator(layer.shape_list.begin()), std::make_move_iterator(layer.shape_list.end()));
             }
         }
         std::cout << "Create time is: " << timer.SinceStartSecs() << std::endl;
