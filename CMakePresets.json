@@ -21,7 +21,8 @@
             "cacheVariables": {
                 "CMAKE_CXX_COMPILER": "cl",
                 "CMAKE_C_COMPILER": "cl",
-                "VCPKG_TARGET_TRIPLET" : "x64-windows"
+                "VCPKG_TARGET_TRIPLET" : "x64-windows",
+                "VCPKG_HOST_TRIPLET" : "x64-windows"
             },
             "toolset": {
                 "value": "v143"
@@ -33,7 +34,8 @@
             "cacheVariables": {
                 "CMAKE_CXX_COMPILER": "g++",
                 "CMAKE_C_COMPILER": "gcc",
-                "VCPKG_TARGET_TRIPLET" : "x64-mingw-dynamic"
+                "VCPKG_TARGET_TRIPLET" : "x64-mingw-dynamic",
+                "VCPKG_HOST_TRIPLET" : "x64-mingw-dynamic"
             }
         }
     ],

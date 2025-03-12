@@ -57,7 +57,7 @@ ShapeType Circle::GetShapeType() const
 
 BoundingBox Circle::GetBoundingBox() const 
 {
-    return { center_ - radius_ / 2.f, center_ + radius_ / 2.f };
+    return { center_ - radius_ , center_ + radius_ };
 }
 
 std::string Circle::ToString() const 

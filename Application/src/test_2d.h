@@ -40,12 +40,13 @@ namespace Test
             glm::vec4 color{};
             int mode{};
             glm::vec3 parameter{}; // for different shape
+            int selected{};
         };
 
-        class RenderItem
+        struct RenderItem
         {
-            int offset;
-            int mode;
+            unsigned int offset;
+            ShapeType mode;
         };
 
         struct GridShaderParameter
@@ -91,6 +92,8 @@ namespace Test
 
         void ClearShapes();
 
+        void ClearIndices();
+
         void RenderScene();
 
         void RenderSelectArea(const BoundingBox& select_area);
@@ -99,7 +102,13 @@ namespace Test
 
         void CreateRandomShapes();
 
-        void DrawShapeCallback(Shape*);
+        bool DrawShapeCallback(Shape*);
+
+        void SetShapeSelect(Shape* shape, bool select);
+
+        void ClearSelectShape();
+
+        bool SelectShapeCallback(Shape*);
 
         void SortShapeLayer();
 
@@ -109,6 +118,7 @@ namespace Test
 		bool first_pressed = true;
 		glm::vec2 origin_pressed_pos_ = { 0.f,0.f };
         std::vector<std::unique_ptr<Shape>> shape_list_;
+        std::vector<Shape*> select_shape_list_;
         std::map<uuids::uuid, RenderItem> shape_render_item_map_;
         std::vector<std::unique_ptr<ShapeLayer>> shape_layer_list_;
 
@@ -132,5 +142,7 @@ namespace Test
         GLuint* shape_index_buffer_map_;
         unsigned int current_shape_vertex_size{};
         unsigned int current_shape_index_size{};
+
+        unsigned int current_viewport_shape{};
     };
 }

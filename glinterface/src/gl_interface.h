@@ -1,7 +1,5 @@
 #pragma once
 #include "glcommon.h"
-#include "shader_program.h"
-#include "vertex_array.h"
 
 namespace glinterface
 {

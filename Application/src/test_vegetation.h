@@ -4,6 +4,8 @@
 #include <glm/vec3.hpp>
 #include "test_base.h"
 #include "texture.h"
+#include "shader_program.h"
+#include "vertex_array.h"
 #include "camera_3d.h"
 
 namespace Test

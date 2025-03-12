@@ -21,7 +21,7 @@ public:
     virtual std::string ToString() const = 0;
     virtual ShapeType GetShapeType() const = 0; 
     virtual void Accept(ShapeRenderer* renderer) = 0;
-    uuids::uuid uuid();
+    uuids::uuid uuid() { return uuid_; }
     glm::vec4 color() { return color_; }
     float layer() { return layer_; }    
     void set_color(const glm::vec4& color) { color_ = color; }

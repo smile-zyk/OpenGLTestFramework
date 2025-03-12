@@ -85,7 +85,7 @@ int main()
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
 	glfwGetWindowSize(window, &screen_width, &screen_height);
-
+	glfwSwapInterval(1);
 	{
 		IMGUI_CHECKVERSION();
 		// init imgui

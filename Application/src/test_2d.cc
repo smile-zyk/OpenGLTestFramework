@@ -3,11 +3,14 @@
 #include "boundingbox.h"
 #include "shape.h"
 #include "shape_layer.h"
+#include "shape_rtree.h"
 #include "test_base.h"
 #include "thread_pool.h"
 #include "prof_timer.h"
 
+#include <GLFW/glfw3.h>
 #include <cstring>
+#include <functional>
 #include <future>
 #include <imgui.h>
 
@@ -21,10 +24,11 @@
 using namespace glinterface;
 
 bool EnableThreadPoolCreate = true;
-int Layer = 100;
+bool EnableRTreeCulling = true;
+int Layer = 1;
 const int kMaxLayer = 10000;
-const int kRectanglePerLayer = 5;
-const int kCirclePerLayer = 5;
+const int kRectanglePerLayer = 50;
+const int kCirclePerLayer = 50;
 const int kVertexNumber = kMaxLayer * kRectanglePerLayer * 4 + kMaxLayer * kCirclePerLayer * 3;
 const int kIndexNumber = kMaxLayer * kRectanglePerLayer * 6 + kMaxLayer * kCirclePerLayer * 3;
 
@@ -56,20 +60,24 @@ namespace Test
         shape_vertex_array_.bind_vertex_buffer(1, shape_vertex_buffer_, offsetof(Vertex, color), sizeof(Vertex));
         shape_vertex_array_.bind_vertex_buffer(2, shape_vertex_buffer_, offsetof(Vertex, mode), sizeof(Vertex));
         shape_vertex_array_.bind_vertex_buffer(3, shape_vertex_buffer_, offsetof(Vertex, parameter), sizeof(Vertex));
+        shape_vertex_array_.bind_vertex_buffer(4, shape_vertex_buffer_, offsetof(Vertex, selected), sizeof(Vertex));
         shape_vertex_array_.bind_element_buffer(shape_index_buffer_);
 
         shape_vertex_array_.set_attrib(0, 3, GL_FLOAT, false, 0);
         shape_vertex_array_.set_attrib(1, 4, GL_FLOAT, false, 0);
         shape_vertex_array_.set_attrib(2, 1, GL_INT, false, 0);
         shape_vertex_array_.set_attrib(3, 3, GL_FLOAT, false, 0);
+        shape_vertex_array_.set_attrib(4, 1, GL_INT, false, 0);
         shape_vertex_array_.bind_attrib(0, 0);
         shape_vertex_array_.bind_attrib(1, 1);
         shape_vertex_array_.bind_attrib(2, 2);
         shape_vertex_array_.bind_attrib(3, 3);
+        shape_vertex_array_.bind_attrib(4, 4);
         shape_vertex_array_.enable_attrib(0);
         shape_vertex_array_.enable_attrib(1);
         shape_vertex_array_.enable_attrib(2);
         shape_vertex_array_.enable_attrib(3);
+        shape_vertex_array_.enable_attrib(4);
         
         // init gl state
         gl_interface_.set_clear_color(0.2f, 0.2f, 0.2f, 1.0f);
@@ -105,6 +113,9 @@ namespace Test
     
     const char* select_area_modes[] = {"NoOutline", "SolidOutline", "DashOutline"};
     
+    double search_time = 0;
+    double draw_time = 0;
+
     void Test2D::OnImGuiRender()
     {
         glm::vec2 min = select_area_.GetMin();
@@ -114,6 +125,9 @@ namespace Test
         glm::vec2 viewport_min = viewport.GetMin();
         glm::vec2 viewport_max = viewport.GetMax();
         ImGui::Text("Viewport is (%.2f, %.2f), (%.2f, %.2f)", viewport_min.x, viewport_min.y, viewport_max.x, viewport_max.y);
+        ImGui::Text("Viewport cover shape number: %u", current_viewport_shape);
+        ImGui::Text("Viewport search time: %lf s", search_time);
+        ImGui::Text("Viewport draw time: %lf s", draw_time);
         ImGui::Text("Layer:");
         ImGui::SameLine();
         if(ImGui::InputInt("##hiddenLabel", &Layer))
@@ -124,6 +138,17 @@ namespace Test
             ClearShapes();
             CreateRandomShapes();
             DrawShapes();
+        }
+        if(ImGui::Checkbox("RTree Culling", &EnableRTreeCulling))
+        {
+            ClearIndices();
+            if(!EnableRTreeCulling)
+            for(const auto &layer : shape_layer_list_)
+            {
+                auto shapes = layer->GetRTree().GetShapes();
+                for(const auto& shape: shapes)
+                    DrawShapeCallback(shape);
+            }
         }
         ImGui::BeginGroup();
         ImGui::Text("Grid");
@@ -218,6 +243,11 @@ namespace Test
         {
             camera_.set_center({0.f, 0.f});
         }
+
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        {
+            ClearSelectShape();
+        }
     }
     
     void Test2D::Draw(Shape* shape)
@@ -269,6 +299,8 @@ namespace Test
         memcpy(&shape_vertex_buffer_map_[current_shape_vertex_size], vertices.data(), 4 * sizeof(Vertex));
         memcpy(&shape_index_buffer_map_[current_shape_index_size], indices.data(), 6 * sizeof(GLuint));
     
+        shape_render_item_map_.insert({rect->uuid(), RenderItem{current_shape_vertex_size, kRectangle}});
+
         current_shape_vertex_size += 4;
         current_shape_index_size += 6;
     }
@@ -316,6 +348,8 @@ namespace Test
         memcpy(&shape_vertex_buffer_map_[current_shape_vertex_size], vertices.data(), 3 * sizeof(Vertex));
         memcpy(&shape_index_buffer_map_[current_shape_index_size], indices.data(), 3 * sizeof(GLuint));
     
+        shape_render_item_map_.insert({circle->uuid(), RenderItem{current_shape_vertex_size, kCircle}});
+
         current_shape_vertex_size += 3;
         current_shape_index_size += 3;
     }
@@ -328,11 +362,19 @@ namespace Test
     
     void Test2D::ClearShapes()
     {
+        select_shape_list_.clear();
+        shape_layer_list_.clear();
         shape_list_.clear();
         memset(shape_vertex_buffer_map_, 0, kVertexNumber * sizeof(Vertex));
         memset(shape_index_buffer_map_, 0, kIndexNumber * sizeof(GLuint));
         current_shape_index_size = 0;
         current_shape_vertex_size = 0;
+    }
+    
+    void Test2D::ClearIndices()
+    {
+        memset(shape_index_buffer_map_, 0, kIndexNumber * sizeof(GLuint));
+        current_shape_index_size = 0;
     }
     
     void Test2D::RenderScene()
@@ -364,16 +406,40 @@ namespace Test
             rect_shader_.set_uniform_value("filled_color", rect_shader_parameter_.filled_color);
             rect_vertex_array_.bind();
             gl_interface_.draw_arrays(GL_TRIANGLES, 6);
+
+            ClearSelectShape();
+            auto s_min = select_area.GetMin();
+            auto s_max = select_area.GetMax();
+            auto viewport = camera_.GetViewport();
+            auto v_min = viewport.GetMin();
+            auto v_max = viewport.GetMax();
+            BoundingBox box{v_min + s_min * (v_max - v_min), v_min + s_max * (v_max - v_min)};
+            ShapeRTree::ShapeRTreeCallback select_callback = std::bind(&Test2D::SelectShapeCallback, this, std::placeholders::_1);
+            for(const auto &layer : shape_layer_list_)
+            layer->GetRTree().Search(box, select_callback);
         }
     }
     
     void Test2D::RenderShapes()
     {
+        ProfTimer search_timer("CreateRandomShapes Time");
+        if(EnableRTreeCulling)
+        {
+            ClearIndices();
+            current_viewport_shape = 0;
+            auto view_port = camera_.GetViewport();
+            ShapeRTree::ShapeRTreeCallback shape_call_back = std::bind(&Test2D::DrawShapeCallback, this, std::placeholders::_1);
+            for(const auto &layer : shape_layer_list_)
+                layer->GetRTree().Search(view_port, shape_call_back);
+        }
+        search_time = search_timer.SinceStartSecs();
+        ProfTimer draw_timer("CreateRandomShapes Time");
         shape_vertex_array_.bind();
         shape_shader_.use();
         shape_shader_.set_uniform_value("view_matrix", camera_.view_matrix());
         shape_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
         gl_interface_.draw_elements(GL_TRIANGLES, current_shape_index_size, GL_UNSIGNED_INT, nullptr);
+        draw_time = draw_timer.SinceStartSecs();
     }
     
     float GenerateRandomValue(float min, float max)
@@ -390,7 +456,7 @@ namespace Test
         float r = GenerateRandomValue(0.f, 1.f);
         float g = GenerateRandomValue(0.f, 1.f);
         float b = GenerateRandomValue(0.f, 1.f);
-        float a = 1.0f;
+        float a = 0.6f;
         return {r, g, b, a};
     }
 
@@ -493,5 +559,63 @@ namespace Test
             }
         }
         std::cout << "Create time is: " << timer.SinceStartSecs() << std::endl;
+    }
+    
+    bool Test2D::DrawShapeCallback(Shape* shape)
+    {
+        auto id = shape->uuid();
+        auto render_item = shape_render_item_map_.at(id);
+        if(render_item.mode == kRectangle)
+        {
+            static GLuint rect_indices[6] = { 0, 1, 2, 0, 2, 3};
+            std::vector<GLuint> indices;
+            indices.resize(6);
+            for(int i = 0; i < 6; i++) indices[i] = render_item.offset + rect_indices[i];
+            memcpy(&shape_index_buffer_map_[current_shape_index_size], indices.data(), 6 * sizeof(GLuint));
+            current_shape_index_size += 6;
+        }
+        else if(render_item.mode == kCircle)
+        {
+            std::vector<GLuint> indices;
+            indices.resize(3);
+            for(int i = 0; i < 3; i++) indices[i] = render_item.offset + i;
+            memcpy(&shape_index_buffer_map_[current_shape_index_size], indices.data(), 3 * sizeof(GLuint));
+            current_shape_index_size += 3;
+        }
+        current_viewport_shape++;
+        return true;
+    }
+    
+    void Test2D::SetShapeSelect(Shape* shape, bool select)
+    {
+        auto id = shape->uuid();
+        auto render_item = shape_render_item_map_.at(id);
+        if(render_item.mode == kRectangle)
+        {
+            int offset = render_item.offset;
+            for(int i = 0; i < 4; i++)
+                shape_vertex_buffer_map_[offset++].selected = select;
+        }
+        else if(render_item.mode == kCircle)
+        {
+            int offset = render_item.offset;
+            for(int i = 0; i < 3; i++)
+                shape_vertex_buffer_map_[offset++].selected = select;
+        }
+    }
+    
+    void Test2D::ClearSelectShape()
+    {
+        for(auto shape : select_shape_list_)
+        {
+            SetShapeSelect(shape, false);
+        }
+    }
+    
+    bool Test2D::SelectShapeCallback(Shape* shape)
+    {
+        SetShapeSelect(shape, true);
+        select_shape_list_.push_back(shape);
+        return true;
     }
 }
