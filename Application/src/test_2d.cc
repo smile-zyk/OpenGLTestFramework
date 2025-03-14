@@ -438,6 +438,7 @@ namespace Test
         shape_shader_.use();
         shape_shader_.set_uniform_value("view_matrix", camera_.view_matrix());
         shape_shader_.set_uniform_value("projection_matrix", camera_.projection_matrix());
+        shape_shader_.set_uniform_value("screen_size", glm::vec2{screen_width, screen_height});
         gl_interface_.draw_elements(GL_TRIANGLES, current_shape_index_size, GL_UNSIGNED_INT, nullptr);
         draw_time = draw_timer.SinceStartSecs();
     }

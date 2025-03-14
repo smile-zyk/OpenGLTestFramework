@@ -9,8 +9,6 @@ layout(location = 2) in int mode;
 layout(location = 3) in vec3 parameter;
 layout(location = 4) in int selected;
 
-vec3 select_pos;
-
 const int RECTANGLE = 0;
 const int CIRCLE = 1;
 
@@ -79,11 +77,10 @@ vec4 get_select_color(vec4 origin_color)
 
 void main()
 {
-    select_pos = position;
     if(mode == RECTANGLE)
     {
         gl_Position = projection_matrix * view_matrix * vec4(position, 1.0);
-        frag_pos = (view_matrix * vec4(position, 1.0)).xy;
+        frag_pos = position.xy;
     }
     else if(mode == CIRCLE)
     {
@@ -97,7 +94,6 @@ void main()
     frag_parameter = parameter;
     if(selected == 1)
     {
-        select_pos.z -= 2048;
         frag_color = get_select_color(color);
     }
 }
